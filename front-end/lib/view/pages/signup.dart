@@ -1,3 +1,4 @@
+import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 
@@ -80,6 +81,8 @@ class Signup extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       //회원가입 완료 로직
+                      UserRepository u = UserRepository();
+                      u.register("테스트", "1234", "test@test.com");
                     },
                     child: Text(
                       '회원가입',
