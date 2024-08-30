@@ -1,6 +1,6 @@
 import 'package:exercise_calendar/controller/main_controller.dart';
-import 'package:exercise_calendar/view/exercise_calender.dart';
-import 'package:exercise_calendar/view/exercise_history.dart';
+import 'package:exercise_calendar/view/pages/exercise_calender.dart';
+import 'package:exercise_calendar/view/pages/exercise_history.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
