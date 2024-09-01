@@ -6,9 +6,10 @@ import 'package:get/get_connect/http/src/response/response.dart';
 class UserRepository {
   final UserProvider _userProvider = UserProvider();
 
-  Future<void> register(String username, String password, String email) async {
+  Future<void> register(
+      String userid, String username, String password, String email) async {
     //Map형태로 데이터 바꾸기 위해(Json이 Map 형태이기 때문)
-    SignupReqDto signupReqDto = SignupReqDto(username, password, email);
+    SignupReqDto signupReqDto = SignupReqDto(userid, username, password, email);
     print("==========");
     print(signupReqDto.toJson());
 
