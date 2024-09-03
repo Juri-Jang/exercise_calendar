@@ -113,8 +113,9 @@ class Signup extends StatelessWidget {
                           ? () {
                               //회원가입 완료 로직
                               UserRepository u = UserRepository();
-                              u.register(userName.text, userId.text,
+                              u.register(userId.text, userName.text,
                                   password.text, email.text);
+                              //u.register("이름", "아이디", "비번", "메일");
                             }
                           : null, // 비밀번호가 일치하지 않으면 버튼 비활성화
                       child: Text(
