@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -17,7 +18,6 @@ public class UserService {
         //비밀번호를 암호화하여 저장
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword); // 암호화된 비밀번호를 사용자 객체에 설정
-        System.out.println("---123123--------------------------");
 
         //DB에 사용자 정보 저장
         userRepository.save(user);
