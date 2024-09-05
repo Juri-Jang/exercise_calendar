@@ -17,7 +17,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/register").permitAll() // /register 엔드포인트는 인증 없이 허용
+                        .requestMatchers("/check-userid/**", "/register").permitAll() // /register 엔드포인트는 인증 없이 허용
                         .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 );
 
