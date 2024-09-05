@@ -1,6 +1,7 @@
 import 'package:exercise_calendar/controller/signupController.dart';
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/pages/exercise_calender.dart';
+import 'package:exercise_calendar/view/pages/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -127,12 +128,12 @@ class Signup extends StatelessWidget {
                 children: [
                   Obx(() {
                     return ElevatedButton(
-                      onPressed: signupController.isSignupValid()
+                      onPressed: signupController.isDone
                           ? () {
                               // 회원가입 완료 로직
                               ur.register(userId.text, userName.text,
                                   password.text, email.text);
-                              Get.to(() => ExerciseCalender());
+                              Get.to(() => MainScreen());
                             }
                           : null, // 비밀번호가 일치하지 않으면 버튼 비활성화
                       child: Text(
