@@ -12,4 +12,17 @@ class UserProvider extends GetConnect {
       headers: {'Content-Type': 'application/json'},
     );
   }
+
+  // 회원가입 id 중복 확인
+  Future<bool> isUseridTaken(String userid) async {
+    final response = await get(
+        '$host/check-userid/$userid'); // query => URL 끝에 ?로 시작하는 부분 (키-값 깡으로 데이터를 서버에 전달)
+
+    if (response.statusCode == 200) {
+      return response.body as bool;
+    } else {
+      print('Error: ${response.statusCode}, Body: ${response.body}');
+      throw Exception('Failed to check userid');
+    }
+  }
 }

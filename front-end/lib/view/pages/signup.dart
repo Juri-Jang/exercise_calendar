@@ -12,6 +12,8 @@ class Signup extends StatelessWidget {
   final TextEditingController passwordCheck = TextEditingController();
   final TextEditingController email = TextEditingController();
 
+  UserRepository ur = UserRepository();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,17 +42,32 @@ class Signup extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
-              Container(
-                width: 300,
-                child: TextField(
-                  controller: userId,
-                  decoration: InputDecoration(
-                    labelText: '아이디',
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Colors.white,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 200,
+                    child: TextField(
+                      controller: userId,
+                      decoration: InputDecoration(
+                        labelText: '아이디',
+                        border: OutlineInputBorder(),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      signupController.checkUserid(userId.text);
+                    },
+                    child: Text(
+                      '중복확인',
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 20),
               Container(
@@ -111,11 +128,9 @@ class Signup extends StatelessWidget {
                     return ElevatedButton(
                       onPressed: signupController.passwordsMatch
                           ? () {
-                              //회원가입 완료 로직
-                              UserRepository u = UserRepository();
-                              u.register(userId.text, userName.text,
+                              // 회원가입 완료 로직
+                              ur.register(userId.text, userName.text,
                                   password.text, email.text);
-                              //u.register("이름", "아이디", "비번", "메일");
                             }
                           : null, // 비밀번호가 일치하지 않으면 버튼 비활성화
                       child: Text(

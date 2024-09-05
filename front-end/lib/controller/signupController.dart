@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:exercise_calendar/domain/user/user_provider.dart';
 import 'package:get/get.dart';
 
 class SignupController extends GetxController {
@@ -17,5 +20,20 @@ class SignupController extends GetxController {
   // 비밀번호 확인 필드의 값이 변경될 때 호출
   void updatePasswordCheck(String value) {
     passwordCheck.value = value;
+  }
+
+  // 중복 확인 함수
+  Future<void> checkUserid(String userid) async {
+    try {
+      bool isTaken = await UserProvider().isUseridTaken(userid);
+      if (isTaken) {
+        Get.snackbar('중복 확인', '이미 존재하는 아이디입니다. \n다른 아이디를 사용해주세요.');
+      } else {
+        Get.snackbar('중복 확인', '사용 가능한 아이디입니다.');
+      }
+    } catch (e) {
+      Get.snackbar('오류', '아이디 확인 중 문제가 발생했습니다.');
+      print('e : $e');
+    }
   }
 }
