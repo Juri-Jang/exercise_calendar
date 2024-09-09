@@ -62,6 +62,7 @@ class ExerciseCalender extends StatelessWidget {
               calendarBuilders: CalendarBuilders(
                 markerBuilder: (context, day, focusedDay) {
                   if (c.exerciseDays.any((d) => isSameDay(d, day))) {
+                    print('tedtsest:${c.exerciseDays}');
                     return Positioned(
                       child: Image.asset(
                         'assets/아령.png',

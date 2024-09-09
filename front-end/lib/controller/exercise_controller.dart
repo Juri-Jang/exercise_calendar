@@ -1,3 +1,4 @@
+import 'package:exercise_calendar/view/pages/exercise_calender.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,16 +22,19 @@ class ExerciseController extends GetxController {
   void registerExercise(DateTime dt, int num) {
     if (num == 0) {
       // 신규 등록
-      exerciseList.add({
-        '날짜': dt,
-        '종목': selectedExercise.value,
-        '시작시간': startTime.value,
-        '종료시간': endTime.value,
-        '운동기록': feedbackController.text,
-        '평점': rating.value
-      });
+      exerciseList.add(
+        {
+          '날짜': dt,
+          '종목': selectedExercise.value,
+          '시작시간': startTime.value,
+          '종료시간': endTime.value,
+          '운동기록': feedbackController.text,
+          '평점': rating.value
+        },
+      );
       if (!exerciseDays.contains(dt)) {
         exerciseDays.add(dt); // 운동 등록 시 날짜 추가
+        print('days: $exerciseDays');
       }
     } else if (num == 1) {
       // 기존 내용 수정
@@ -48,7 +52,8 @@ class ExerciseController extends GetxController {
       }
     }
     clear();
-    Get.back();
+    Get.off(
+        ExerciseCalender()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
     print('운동 등록 성공');
     printExercise();
   }
