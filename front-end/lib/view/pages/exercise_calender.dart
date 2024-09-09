@@ -1,4 +1,5 @@
 import 'package:exercise_calendar/controller/exercise_controller.dart';
+import 'package:exercise_calendar/view/components/custom_drawer.dart';
 import 'package:exercise_calendar/view/pages/exercise_register.dart';
 import 'package:exercise_calendar/view/components/custom_appbar.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class ExerciseCalender extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: '운동 캘린더'),
+      endDrawer: CustomDrawer(),
       floatingActionButton: FloatingActionButton(
         child: Text(
           '+',

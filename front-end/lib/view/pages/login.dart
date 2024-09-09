@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/view/pages/main_screen.dart';
+import 'package:exercise_calendar/view/components/main_screen.dart';
 import 'package:exercise_calendar/view/pages/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';

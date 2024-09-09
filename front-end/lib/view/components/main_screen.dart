@@ -19,21 +19,23 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(() => _screens[controller.selectedIndex.value]),
-      bottomNavigationBar: Obx(() => BottomNavigationBar(
-            currentIndex: controller.selectedIndex.value,
-            onTap: controller.onItemTapped,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.calendar_today),
-                label: '운동 캘린더',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.search),
-                label: '운동 조회',
-              ),
-              // 다른 항목 추가 가능
-            ],
-          )),
+      bottomNavigationBar: Obx(
+        () => BottomNavigationBar(
+          currentIndex: controller.selectedIndex.value,
+          onTap: controller.onItemTapped,
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today),
+              label: '운동 캘린더',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: '운동 조회',
+            ),
+            // 다른 항목 추가 가능
+          ],
+        ),
+      ),
     );
   }
 }

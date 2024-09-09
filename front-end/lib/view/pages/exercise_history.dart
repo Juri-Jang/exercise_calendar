@@ -1,6 +1,7 @@
 import 'package:exercise_calendar/controller/exercise_controller.dart';
 import 'package:exercise_calendar/controller/exercise_history_controller.dart';
 import 'package:exercise_calendar/view/components/custom_appbar.dart';
+import 'package:exercise_calendar/view/components/custom_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -21,6 +22,7 @@ class ExerciseHistory extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(title: '운동 조회'),
+      endDrawer: CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
