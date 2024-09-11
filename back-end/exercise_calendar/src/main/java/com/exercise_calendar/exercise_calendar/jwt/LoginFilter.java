@@ -20,14 +20,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        //클라이언트 요청에서 username, password 추출
-        String username = obtainUsername(request);
+        //클라이언트 요청에서 userid, password 추출
+        String userid = obtainUsername(request);
         String password = obtainPassword(request);
 
-        System.out.println("test"+ username);
+        System.out.println("test"+ userid);
 
-        //스프링 시큐리티에서 username과 password를 검증하기 위해서는 token에 담아야 함
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
+        //스프링 시큐리티에서 userid과 password를 검증하기 위해서는 token에 담아야 함
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userid, password, null);
 
         //token에 담은 검증을 위한 AuthenticationManager로 전달
         return authenticationManager.authenticate(authToken);
@@ -36,11 +36,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //로그인 성공 (JWT 발급)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+        System.out.println("성공");
     }
 
     //로그인 실패
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
-
+        System.out.println("실패 ㅠㅠ");
     }
 }

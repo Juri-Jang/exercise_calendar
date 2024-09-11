@@ -14,9 +14,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // ID 중복 확인
-    public boolean isUseridTaken(String userid){
-        if(userRepository.findByUserid(userid).isPresent()){
+//    // ID 중복 확인
+    public boolean isUseridTaken(String username){
+        if(userRepository.findByUsername(username).isPresent()){
             System.out.println("중복된 아이디가 존재합니다.");
             return true;
         }else{

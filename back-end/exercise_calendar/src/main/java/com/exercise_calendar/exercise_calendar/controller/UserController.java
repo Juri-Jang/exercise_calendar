@@ -26,7 +26,7 @@ public class UserController {
         // 프론트엔드에서 전달된 값 확인 (디버깅용)
         System.out.println("Received User Data: " + user.toString());
         String msg = userService.registerUser(user);
-        if (user.getUsername() == null || user.getUserid() == null || user.getPassword() == null || user.getEmail() == null) {
+        if (user.getUsername() == null || user.getUsername() == null || user.getPassword() == null || user.getEmail() == null) {
             System.out.println("Some fields are null!");
         }
         return new ResponseEntity<String>(msg, HttpStatus.OK);
