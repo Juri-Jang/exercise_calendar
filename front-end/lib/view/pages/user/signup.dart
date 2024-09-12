@@ -1,6 +1,6 @@
 import 'package:exercise_calendar/controller/signupController.dart';
 import 'package:exercise_calendar/domain/user/user_repository.dart';
-import 'package:exercise_calendar/view/pages/login.dart';
+import 'package:exercise_calendar/view/pages/user/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

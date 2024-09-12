@@ -1,6 +1,6 @@
-import 'package:exercise_calendar/controller/exercise_controller.dart';
+import 'package:exercise_calendar/controller/temporary/exercise_controller.dart';
 import 'package:exercise_calendar/view/components/custom_drawer.dart';
-import 'package:exercise_calendar/view/pages/exercise_register.dart';
+import 'package:exercise_calendar/view/pages/post/exercise_register.dart';
 import 'package:exercise_calendar/view/components/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

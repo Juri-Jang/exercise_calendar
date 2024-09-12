@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/view/pages/exercise_calender.dart';
+import 'package:exercise_calendar/view/pages/post/exercise_calender.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

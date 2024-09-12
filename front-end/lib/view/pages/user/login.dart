@@ -1,11 +1,12 @@
-import 'package:exercise_calendar/controller/login_controller.dart';
-import 'package:exercise_calendar/view/components/main_screen.dart';
-import 'package:exercise_calendar/view/pages/signup.dart';
+import 'package:exercise_calendar/controller/user_controller.dart';
+import 'package:exercise_calendar/view/pages/user/signup.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get/route_manager.dart';
 
 class Login extends StatelessWidget {
-  final LoginController c = LoginController();
+  UserController u = Get.put(UserController());
+
   final TextEditingController username = TextEditingController();
   final TextEditingController password = TextEditingController();
 
@@ -93,10 +94,11 @@ class Login extends StatelessWidget {
                         ElevatedButton(
                           onPressed: () {
                             // 로그인 시도
-                            c.LoginCheck(username.text, password.text);
+                            //c.LoginCheck(username.text, password.text);
+                            u.login(username.text, password.text);
                             //Get.to(() => MainScreen());
                           },
-                          child: Text('로그인'),
+                          child: Text(' 로그인'),
                         ),
                       ],
                     ),
