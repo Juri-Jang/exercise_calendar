@@ -1,5 +1,6 @@
 package com.exercise_calendar.exercise_calendar.config;
 
+import com.exercise_calendar.exercise_calendar.jwt.JWTFilter;
 import com.exercise_calendar.exercise_calendar.jwt.JWTUtil;
 import com.exercise_calendar.exercise_calendar.jwt.LoginFilter;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,8 @@ public class SecurityConfig {
                         .requestMatchers("/check-userid/**", "/register").permitAll() // /register 엔드포인트는 인증 없이 허용
                         .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 );
+        http
+                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
