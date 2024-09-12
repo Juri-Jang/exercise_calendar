@@ -1,6 +1,7 @@
 import 'package:exercise_calendar/controller/signupController.dart';
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
+import 'package:exercise_calendar/view/pages/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -132,7 +133,7 @@ class Signup extends StatelessWidget {
                               // 회원가입 완료 로직
                               ur.register(userId.text, userName.text,
                                   password.text, email.text);
-                              Get.to(() => MainScreen());
+                              Get.to(() => Login());
                             }
                           : null, // 비밀번호가 일치하지 않으면 버튼 비활성화
                       child: Text(

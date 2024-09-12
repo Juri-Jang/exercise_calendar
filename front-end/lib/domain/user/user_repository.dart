@@ -7,9 +7,9 @@ class UserRepository {
   final UserProvider _userProvider = UserProvider();
 
   Future<void> register(
-      String username, String userid, String password, String email) async {
+      String username, String password, String name, String email) async {
     //Map형태로 데이터 바꾸기 위해(Json이 Map 형태이기 때문)
-    SignupReqDto signupReqDto = SignupReqDto(username, userid, password, email);
+    SignupReqDto signupReqDto = SignupReqDto(username, password, name, email);
     print("==========");
     print(signupReqDto.toJson());
 
