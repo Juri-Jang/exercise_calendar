@@ -1,9 +1,14 @@
+import 'package:exercise_calendar/controller/login_controller.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
 import 'package:exercise_calendar/view/pages/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
 
 class Login extends StatelessWidget {
+  final LoginController c = LoginController();
+  final TextEditingController username = TextEditingController();
+  final TextEditingController password = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,6 +72,7 @@ class Login extends StatelessWidget {
                     child: Column(
                       children: [
                         TextField(
+                          controller: username,
                           decoration: InputDecoration(
                               labelText: 'ID',
                               border: OutlineInputBorder(),
@@ -75,6 +81,7 @@ class Login extends StatelessWidget {
                         ),
                         SizedBox(height: 20),
                         TextField(
+                          controller: password,
                           obscureText: true,
                           decoration: InputDecoration(
                               labelText: 'PassWord',
@@ -86,8 +93,8 @@ class Login extends StatelessWidget {
                         ElevatedButton(
                           onPressed: () {
                             // 로그인 시도
-                            //임시
-                            Get.to(() => MainScreen());
+                            c.LoginCheck(username.text, password.text);
+                            //Get.to(() => MainScreen());
                           },
                           child: Text('로그인'),
                         ),
