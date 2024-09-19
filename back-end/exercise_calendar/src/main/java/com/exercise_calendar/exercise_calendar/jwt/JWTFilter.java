@@ -25,47 +25,55 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         //request에서 Authorization 헤더를 찾음
-        String authorization = request.getHeader("Authorization");
+        String authorization= request.getHeader("Authorization");
 
         //Autorization 헤더 검증
+        //JWT 토큰 없으면 다음 필터로 이동
         if(authorization == null || !authorization.startsWith("Bearer ")) {
             System.out.println("token null");
-            filterChain.doFilter(request, response); //다음 filter에 request와 response값 전달
+            //토큰이 유효하지 않아 다음 필터로 값 전달
+            filterChain.doFilter(request, response);
 
-             //조건이 해당되면 메소드 종료(필수)
+             //메소드 종료(필수)
             return;
         }
-
+        System.out.println("authorization now");
         //Bearer 제거 후 순수 토큰만 획득
         String token = authorization.split(" ")[1];
 
         //토큰 소멸 시간 검증
+        //JWT 만료 됐으면 다음 필터로 이동
         if(jwtUtil.isExpired(token)){
             System.out.println("token expired");
             filterChain.doFilter(request, response);
 
-            //조건이 해당되면 메소드 종료(필수
+            //조건이 해당되면 메소드 종료(필수)
             return;
         }
 
+        //최종적으로 토큰 검증 완료
         //토큰에서 username과 role 획득
         String username = jwtUtil.getUsername(token);
         String role = jwtUtil.getRole(token);
 
+        //검증된 user 정보 새로 생성
         //user 엔티티를 생성하여 값 셋팅
         User user = new User();
         user.setUsername(username);
         user.setPassword("temppassword"); //임시 비번
         user.setRole(role);
 
-        //UserDetails에 회원 정보 객체 담기
+        //UserDetails에 검증 완료된 회원 정보 전달
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
-        //스프링 시큐리티 인증 토큰 생성
+        //Spring Security 컨텍스트에 인증된 사용자 정보 저장(Security 인증 토큰 생성)
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+
         //세션에 사용자 등록
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
+        // 필터 체인에서 다음 필터로 이동
+        //필터 체인?
         filterChain.doFilter(request, response);
     }
 }

@@ -39,6 +39,4 @@ public class UserService {
         userRepository.save(user);
         return "회원가입이 성공적으로 되었습니다.";
     }
-
-
 }

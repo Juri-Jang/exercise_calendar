@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -35,10 +36,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
+                .csrf((auth) -> auth.disable());
+        http
+                .formLogin((auth) -> auth.disable());
+        http
+                .httpBasic((auth) -> auth.disable());
+        http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/check-userid/**", "/register").permitAll() // /register 엔드포인트는 인증 없이 허용
+                        .requestMatchers("/check-userid/**", "/register", "/login").permitAll() // /register 엔드포인트는 인증 없이 허용
                         .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 );
         http
@@ -46,6 +53,11 @@ public class SecurityConfig {
 
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        http
+                .sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));  //서버가 세션을 만들지 않도록 하고, 모든 요청은 JWT로 인증
+
 
         return http.build();
     }
