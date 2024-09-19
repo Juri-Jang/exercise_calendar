@@ -7,8 +7,8 @@ import 'package:get/get.dart';
 class Signup extends StatelessWidget {
   final SignupController signupController = Get.put(SignupController());
 
-  final TextEditingController userName = TextEditingController();
-  final TextEditingController userId = TextEditingController();
+  final TextEditingController name = TextEditingController();
+  final TextEditingController username = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController passwordCheck = TextEditingController();
   final TextEditingController email = TextEditingController();
@@ -33,7 +33,7 @@ class Signup extends StatelessWidget {
               Container(
                 width: 300,
                 child: TextField(
-                  controller: userName,
+                  controller: name,
                   decoration: InputDecoration(
                     labelText: '이름',
                     border: OutlineInputBorder(),
@@ -49,7 +49,7 @@ class Signup extends StatelessWidget {
                   Container(
                     width: 200,
                     child: TextField(
-                      controller: userId,
+                      controller: username,
                       decoration: InputDecoration(
                         labelText: '아이디',
                         border: OutlineInputBorder(),
@@ -61,7 +61,7 @@ class Signup extends StatelessWidget {
                   SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () {
-                      signupController.checkUserid(userId.text);
+                      signupController.checkUserid(username.text);
                     },
                     child: Text(
                       '중복확인',
@@ -130,7 +130,7 @@ class Signup extends StatelessWidget {
                       onPressed: signupController.isDone
                           ? () {
                               // 회원가입 완료 로직
-                              ur.register(userId.text, userName.text,
+                              ur.register(name.text, username.text,
                                   password.text, email.text);
                               Get.to(() => Login());
                             }

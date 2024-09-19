@@ -94,9 +94,7 @@ class Login extends StatelessWidget {
                         ElevatedButton(
                           onPressed: () {
                             // 로그인 시도
-                            //c.LoginCheck(username.text, password.text);
                             u.login(username.text, password.text);
-                            //Get.to(() => MainScreen());
                           },
                           child: Text(' 로그인'),
                         ),
