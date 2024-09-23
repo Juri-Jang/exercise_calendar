@@ -17,37 +17,7 @@ class SignupController extends GetxController {
   // password 값과 password check 값이 같으면 true
   bool get passwordsMatch => password.value == passwordCheck.value;
 
-  // 아이디 필드의 값이 변경될 때 호출
-  void updateUsername(String value) {
-    username.value = value;
-    if (value.isEmpty) {
-      isUsernameValid.value = false;
-    } else {
-      isUsernameValid.value = true;
-    }
-    checkIfDone();
-  }
-
-  // 비밀번호 필드의 값이 변경될 때 호출
-  void updatePassword(String value) {
-    password.value = value;
-  }
-
-  // 비밀번호 확인 필드의 값이 변경될 때 호출
-  void updatePasswordCheck(String value) {
-    passwordCheck.value = value;
-  }
-
-  // 이메일 필드의 값이 변경될 때 호출
-  void updateEmail(String value) {
-    email.value = value;
-    if (value.isEmpty) {
-      isEmailValid.value = false;
-    } else {
-      isEmailValid.value = true;
-    }
-    checkIfDone();
-  }
+  void usernameCheck() {}
 
   // 중복 확인 함수
   Future<void> checkUserid(String userid) async {
@@ -67,12 +37,7 @@ class SignupController extends GetxController {
     }
   }
 
-  // 모든 필드가 유효할 때만 회원가입 가능 상태로 설정
-  void checkIfDone() {
-    if (isUsernameValid.value && passwordsMatch && isEmailValid.value) {
-      check.value = true;
-    } else {
-      check.value = false;
-    }
+  void init() {
+    check.value = false;
   }
 }
