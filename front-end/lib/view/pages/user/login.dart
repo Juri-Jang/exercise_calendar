@@ -10,6 +10,8 @@ class Login extends StatelessWidget {
   final TextEditingController username = TextEditingController();
   final TextEditingController password = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,35 +72,58 @@ class Login extends StatelessWidget {
                   SizedBox(height: 50),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: username,
-                          decoration: InputDecoration(
-                              labelText: 'ID',
-                              border: OutlineInputBorder(),
-                              filled: true,
-                              fillColor: Colors.white),
-                        ),
-                        SizedBox(height: 20),
-                        TextField(
-                          controller: password,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                              labelText: 'PassWord',
-                              border: OutlineInputBorder(),
-                              filled: true,
-                              fillColor: Colors.white),
-                        ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            // 로그인 시도
-                            u.login(username.text, password.text);
-                          },
-                          child: Text(' 로그인'),
-                        ),
-                      ],
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: username,
+                            onChanged: (value) {
+                              _formKey.currentState!.validate();
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "ID를 입력해주세요";
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                                labelText: 'ID',
+                                border: OutlineInputBorder(),
+                                filled: true,
+                                fillColor: Colors.white),
+                          ),
+                          SizedBox(height: 20),
+                          TextFormField(
+                            controller: password,
+                            onChanged: (value) {
+                              _formKey.currentState!.validate();
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "비밀번호를 입력해주세요";
+                              }
+                              return null;
+                            },
+                            obscureText: true,
+                            decoration: InputDecoration(
+                                labelText: 'PassWord',
+                                border: OutlineInputBorder(),
+                                filled: true,
+                                fillColor: Colors.white),
+                          ),
+                          SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              // 로그인 시도
+                              if (_formKey.currentState!.validate()) {
+                                u.login(username.text, password.text);
+                              }
+                            },
+                            child: Text(' 로그인'),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 20),

@@ -1,3 +1,4 @@
+import 'package:exercise_calendar/view/components/main_screen.dart';
 import 'package:exercise_calendar/view/pages/post/exercise_calender.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -53,7 +54,7 @@ class ExerciseController extends GetxController {
     }
     clear();
     Get.off(
-        ExerciseCalender()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
+        MainScreen()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
     print('운동 등록 성공');
     printExercise();
   }

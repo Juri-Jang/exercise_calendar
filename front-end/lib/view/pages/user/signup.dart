@@ -107,7 +107,6 @@ class Signup extends StatelessWidget {
                       return null;
                     },
                     obscureText: true,
-                    //onChanged: signupController.updatePassword, // 비밀번호 변경 시 호출
                     decoration: InputDecoration(
                       labelText: '비밀번호',
                       border: OutlineInputBorder(),

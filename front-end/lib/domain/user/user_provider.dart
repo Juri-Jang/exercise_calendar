@@ -1,9 +1,9 @@
 import 'package:get/get.dart';
 
-// const host = "http://192.168.219.103:8080";
+const host = "http://192.168.219.103:8080";
 //const host = "http://192.168.219.102:8080"; //집
-//const host = "http://192.168.19.43:8080";
-const host = "http://10.60.16.189:8080"; //중도
+//const host = "http://192.168.19.43:8080"; //중도
+//const host = "http://10.60.16.189:8080"; //강의실
 //const host = "http://10.61.0.249:8080";
 
 //통신
