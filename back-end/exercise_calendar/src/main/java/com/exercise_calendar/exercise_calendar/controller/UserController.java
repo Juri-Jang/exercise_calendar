@@ -21,7 +21,7 @@ public class UserController {
         return ResponseEntity.ok(isTaken); //이미 존재하면 true, 신규이면 false
     }
 
-    @PostMapping("/register")
+    @PostMapping("/user/register")
     private ResponseEntity<String> register(@RequestBody User user) {
         // 프론트엔드에서 전달된 값 확인 (디버깅용)
         System.out.println("Received User Data: " + user.toString());

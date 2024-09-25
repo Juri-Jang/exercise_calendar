@@ -52,7 +52,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         } else {
             // 기존 방식 (form-data 등) 처리
             username = obtainUsername(request);
-            password = obtainPassword(request);
+            password = obtainPassword(request)  ;
             System.out.println("폼 요청 - 로그인 시도: " + username + " / " + password);
         }
 
