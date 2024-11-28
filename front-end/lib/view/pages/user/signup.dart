@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/controller/signupController.dart';
+import 'package:exercise_calendar/controllers/signupController.dart';
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/pages/user/login.dart';
 import 'package:flutter/material.dart';
@@ -177,7 +177,7 @@ class Signup extends StatelessWidget {
                             ? () {
                                 if (_formKey.currentState!.validate()) {
                                   // 회원가입 완료 로직
-                                  ur.register(name.text, username.text,
+                                  ur.signup(name.text, username.text,
                                       password.text, email.text);
                                   Get.snackbar(
                                       '회원가입 성공', '회원가입이 완료 됐습니다. 로그인을 진행해주세요!');

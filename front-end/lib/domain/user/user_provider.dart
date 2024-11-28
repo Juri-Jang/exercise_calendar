@@ -1,45 +1,39 @@
+import 'package:exercise_calendar/util/constants.dart';
 import 'package:get/get.dart';
 
-//const host = "http://192.168.219.103:8080";
-//const host = "http://192.168.219.102:8080"; //집
-//const host = "http://192.168.19.43:8080"; //중도
-const host = "http://10.73.30.146:8080"; //중도
-//const host = "http://10.60.16.189:8080"; //강의실
-//const host = "http://10.61.0.249:8080";
-
-//통신
-//GetConnet => GetX에서 제공하는 http 통신 라이브러리
 class UserProvider extends GetConnect {
-  Future<Response> login(Map data) {
-    print(data);
+  // 로그인 요청
+  Future<Response> login(Map<String, dynamic> data) {
     return post(
-      "$host/login",
-      data,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-  }
-
-  Future<Response> register(Map data) {
-    print(data);
-    return post(
-      "$host/user/register",
+      "$BASE_URL/login",
       data,
       headers: {'Content-Type': 'application/json'},
     );
   }
 
-  // 회원가입 id 중복 확인
-  Future<bool> isUseridTaken(String userid) async {
-    final response = await get(
-        '$host/check-userid/$userid'); // query => URL 끝에 ?로 시작하는 부분 (키-값 깡으로 데이터를 서버에 전달)
+  // 회원가입 요청
+  Future<Response> register(Map<String, dynamic> data) {
+    return post(
+      "$BASE_URL/user/register",
+      data,
+      headers: {'Content-Type': 'application/json'},
+    );
+  }
 
+  // ID 중복 확인
+  Future<bool> isUseridTaken(String username) async {
+    final response = await get("$BASE_URL/user/check-userid/$username");
     if (response.statusCode == 200) {
       return response.body as bool;
-    } else {
-      print('Error: ${response.statusCode}, Body: ${response.body}');
-      throw Exception('Failed to check userid');
     }
+    throw Exception('ID 중복 확인 실패');
+  }
+
+  // 사용자 정보 조회
+  Future<Response> getUserInfo(String token) {
+    return get(
+      "$BASE_URL/user/profile",
+      headers: {'Authorization': '$token'},
+    );
   }
 }
