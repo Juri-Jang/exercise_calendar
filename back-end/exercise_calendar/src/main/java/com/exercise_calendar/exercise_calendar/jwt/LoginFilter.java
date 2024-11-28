@@ -1,9 +1,12 @@
 package com.exercise_calendar.exercise_calendar.jwt;
 
 import com.exercise_calendar.exercise_calendar.dto.CustomUserDetails;
+import com.exercise_calendar.exercise_calendar.entity.RefreshEntity;
+import com.exercise_calendar.exercise_calendar.repository.RefreshRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,23 +14,21 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
     }
 
     @Override
@@ -71,13 +72,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // 사용자 정보 가져오기
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String token = jwtUtil.createJwt(userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 60 * 60 * 10L);
+        String accessToken = jwtUtil.createJwt("access", userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 60L); //유효시간 1분
+        String refreshToken = jwtUtil.createJwt("refresh", userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 43200000L); //유효시간 12시간
+
+        addRefresh(userDetails.getUsername(), refreshToken, 43200000L);
 
         // 응답 설정
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.addHeader("Authorization", "Bearer " + token);
-
+        response.addHeader("Authorization", "Bearer " + accessToken);
+        response.addCookie(createCookie("refresh", refreshToken));
+        //response.setStatus(HttpStatus.OK.value());
         // JSON 응답 작성
         try {
             response.getWriter().write("{\"message\":\"success\"}");
@@ -86,11 +91,30 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         }
     }
 
-
     //로그인 실패
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws java.io.IOException {
         response.getWriter().write("{\"message\":\"fail\"}");
         response.setStatus(401);
+    }
+
+    protected void addRefresh(String username, String refresh, long expiredMinute){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, Math.toIntExact(expiredMinute));
+        Date date = calendar.getTime();
+
+        RefreshEntity refreshEntity = new RefreshEntity();
+        refreshEntity.setUsername(username);
+        refreshEntity.setRefresh(refresh);
+        refreshEntity.setExpiration(date.toString());
+
+        refreshRepository.save(refreshEntity);
+    }
+
+    Cookie createCookie(String key, String value){
+        Cookie cookie = new Cookie(key, value);
+        cookie.setMaxAge(12*60*60); // 12h
+        cookie.setHttpOnly(true);   //JS로 접근 불가, 탈취 위험 감소
+        return cookie;
     }
 }

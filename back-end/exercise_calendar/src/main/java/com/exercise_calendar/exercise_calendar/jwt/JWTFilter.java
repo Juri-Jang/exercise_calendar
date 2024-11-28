@@ -2,6 +2,7 @@ package com.exercise_calendar.exercise_calendar.jwt;
 
 import com.exercise_calendar.exercise_calendar.dto.CustomUserDetails;
 import com.exercise_calendar.exercise_calendar.entity.User;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,11 +26,11 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         //request에서 Authorization 헤더를 찾음
-        String authorization= request.getHeader("Authorization");
+        String token= request.getHeader("Authorization");
 
         //Autorization 헤더 검증
         //JWT 토큰 없으면 다음 필터로 이동
-        if(authorization == null || !authorization.startsWith("Bearer ")) {
+        if(token == null || !token.startsWith("Bearer ")) {
             System.out.println("token null");
             //토큰이 유효하지 않아 다음 필터로 값 전달
             filterChain.doFilter(request, response);
@@ -37,19 +38,35 @@ public class JWTFilter extends OncePerRequestFilter {
              //메소드 종료(필수)
             return;
         }
-        System.out.println("authorization now");
         //Bearer 제거 후 순수 토큰만 획득
-        String token = authorization.split(" ")[1];
+        token = token.split(" ")[1];
 
-        //토큰 소멸 시간 검증
+        //토큰 만료 검증
         //JWT 만료 됐으면 다음 필터로 이동
-        if(jwtUtil.isExpired(token)){
-            System.out.println("token expired");
-            filterChain.doFilter(request, response);
+//        if(jwtUtil.isExpired(token)){
+//            System.out.println("token expired");
+//            filterChain.doFilter(request, response);
+//            //조건이 해당되면 메소드 종료(필수)
+//            return;
+//        }
 
-            //조건이 해당되면 메소드 종료(필수)
+        try {
+            jwtUtil.isExpired(token);
+        } catch (ExpiredJwtException e) {
+            response.getWriter().write("access token is expired");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
+
+        String category = jwtUtil.getCategory(token);
+
+        // 카테고리 검사(access)
+        if (!category.equals("access")){
+            response.getWriter().write("invalid access token");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
 
         //최종적으로 토큰 검증 완료
         //토큰에서 username과 role 획득
