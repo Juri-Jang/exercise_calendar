@@ -1,14 +1,17 @@
 package com.exercise_calendar.exercise_calendar.controller;
 
+import com.exercise_calendar.exercise_calendar.dto.UserProfileDTO;
 import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-//@CrossOrigin(origins = "http://192.168.219.103:8080")
+@RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -21,7 +24,7 @@ public class UserController {
         return ResponseEntity.ok(isTaken); //이미 존재하면 true, 신규이면 false
     }
 
-    @PostMapping("/user/register")
+    @PostMapping("/register")
     private ResponseEntity<String> register(@RequestBody User user) {
         // 프론트엔드에서 전달된 값 확인 (디버깅용)
         System.out.println("Received User Data: " + user.toString());
@@ -32,5 +35,18 @@ public class UserController {
         return new ResponseEntity<String>(msg, HttpStatus.OK);
     }
 
+    @GetMapping("/profile")
+    public UserProfileDTO getProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.getUserProfile(username);
+
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        userProfileDTO.setUsername(user.getUsername());
+        userProfileDTO.setEmail(user.getEmail());
+        userProfileDTO.setName(user.getName());
+
+        return userProfileDTO;
+    }
 
 }

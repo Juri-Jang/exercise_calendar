@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -66,29 +67,30 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     //로그인 성공 (JWT 발급)
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws java.io.IOException {
 
-        //UserDetails
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        // 사용자 정보 가져오기
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String token = jwtUtil.createJwt(userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 60 * 60 * 10L);
 
-        String username = customUserDetails.getUsername();
+        // 응답 설정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.addHeader("Authorization", "Bearer " + token);
 
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
-
-        String role = auth.getAuthority();
-
-        String token = jwtUtil.createJwt(username, role, 60*60*10L); //jwt 생성
-        System.out.println("JWT Token: " + token); // JWT 토큰을 로그로 출력
-
-        response.addHeader("Authorization", "Bearer " + token);//Bearer 접두사 꼭 붙여야함
-
+        // JSON 응답 작성
+        try {
+            response.getWriter().write("{\"message\":\"success\"}");
+        } catch (IOException | java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     //로그인 실패
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws java.io.IOException {
+        response.getWriter().write("{\"message\":\"fail\"}");
         response.setStatus(401);
     }
 }
