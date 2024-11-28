@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/controller/temporary/main_controller.dart';
+import 'package:exercise_calendar/controllers/main_controller.dart';
 import 'package:exercise_calendar/view/pages/post/exercise_calender.dart';
 import 'package:exercise_calendar/view/pages/post/exercise_history.dart';
 import 'package:flutter/cupertino.dart';

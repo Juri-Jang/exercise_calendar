@@ -1,5 +1,4 @@
 import 'package:exercise_calendar/view/components/main_screen.dart';
-import 'package:exercise_calendar/view/pages/post/exercise_calender.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -81,7 +80,6 @@ class ExerciseController extends GetxController {
     endTime = TimeOfDay.now().obs;
     rating = 1.obs;
     feedbackController.clear();
-    print('클리어 완');
   }
 
   void onDaySelected(DateTime day) {

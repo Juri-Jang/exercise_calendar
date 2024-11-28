@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/controller/temporary/exercise_controller.dart';
+import 'package:exercise_calendar/controllers/exercise_controller.dart';
 import 'package:exercise_calendar/view/components/custom_drawer.dart';
 import 'package:exercise_calendar/view/pages/post/exercise_register.dart';
 import 'package:exercise_calendar/view/components/custom_appbar.dart';
