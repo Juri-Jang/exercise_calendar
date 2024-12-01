@@ -66,23 +66,26 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
 
-    //로그인 성공 (JWT 발급)
+    // 로그인 성공 (JWT 발급)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws java.io.IOException {
 
         // 사용자 정보 가져오기
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String accessToken = jwtUtil.createJwt("access", userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 60L); //유효시간 1분
-        String refreshToken = jwtUtil.createJwt("refresh", userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 43200000L); //유효시간 12시간
 
-        addRefresh(userDetails.getUsername(), refreshToken, 43200000L);
+        // 엑세스 토큰 유효시간 5분 설정
+        String accessToken = jwtUtil.createJwt("access", userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 5L); // 유효시간 5분
+        // 리프레시 토큰 유효시간 12시간 설정
+        String refreshToken = jwtUtil.createJwt("refresh", userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 720L); // 유효시간 12시간 (720분)
+
+        addRefresh(userDetails.getUsername(), refreshToken, 720L);
 
         // 응답 설정
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.addHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
-        //response.setStatus(HttpStatus.OK.value());
+
         // JSON 응답 작성
         try {
             response.getWriter().write("{\"message\":\"success\"}");
@@ -90,6 +93,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             e.printStackTrace();
         }
     }
+
 
     //로그인 실패
     @Override

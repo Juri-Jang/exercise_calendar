@@ -27,7 +27,6 @@ public class ReissueController {
 
     @PostMapping("/reissue")
     public ResponseEntity reissue(HttpServletRequest request, HttpServletResponse response){
-
         // get refresh
         String refresh = null;
         Cookie[] cookies = request.getCookies();
@@ -52,8 +51,8 @@ public class ReissueController {
         // crete new access token
         String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);
-        String newAccess = jwtUtil.createJwt("access", username, role, 60L);
-        String newRefresh = jwtUtil.createJwt("refresh", username, role, 43200000L);
+        String newAccess = jwtUtil.createJwt("access", username, role, 5L);
+        String newRefresh = jwtUtil.createJwt("refresh", username, role, 720L);
 
         // rotate refresh
         refreshRepository.deleteByRefresh(refresh);
