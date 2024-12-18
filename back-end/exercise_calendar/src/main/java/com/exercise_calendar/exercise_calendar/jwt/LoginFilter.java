@@ -1,7 +1,6 @@
 package com.exercise_calendar.exercise_calendar.jwt;
 
-import com.exercise_calendar.exercise_calendar.dto.CustomUserDetails;
-import com.exercise_calendar.exercise_calendar.entity.RefreshEntity;
+import com.exercise_calendar.exercise_calendar.entity.Refresh;
 import com.exercise_calendar.exercise_calendar.repository.RefreshRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.IOException;
@@ -9,11 +8,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.InputStream;
@@ -69,29 +70,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     // 로그인 성공 (JWT 발급)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws java.io.IOException {
+        //유저 정보
+        String username = authentication.getName();
 
-        // 사용자 정보 가져오기
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+        GrantedAuthority auth = iterator.next();
+        String role = auth.getAuthority();
 
-        // 엑세스 토큰 유효시간 5분 설정
-        String accessToken = jwtUtil.createJwt("access", userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 5L); // 유효시간 5분
-        // 리프레시 토큰 유효시간 12시간 설정
-        String refreshToken = jwtUtil.createJwt("refresh", userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority(), 720L); // 유효시간 12시간 (720분)
+        //토큰 생성
+        String access = jwtUtil.createJwt("access", username, role, 600000L); //10분
+        String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L); //24시간
 
-        addRefresh(userDetails.getUsername(), refreshToken, 720L);
+        //Refresh 토큰 저장
+        addRefreshEntity(username, refresh, 86400000L);
 
-        // 응답 설정
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.addHeader("Authorization", "Bearer " + accessToken);
-        response.addCookie(createCookie("refresh", refreshToken));
-
-        // JSON 응답 작성
-        try {
-            response.getWriter().write("{\"message\":\"success\"}");
-        } catch (IOException | java.io.IOException e) {
-            e.printStackTrace();
-        }
+        //응답 설정
+        response.setHeader("access", access); //응답 헤더에 설정
+        response.addCookie(createCookie("refresh", refresh)); //응답 쿠키에 설정
+        response.setStatus(HttpStatus.OK.value());
     }
 
 
@@ -102,12 +99,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setStatus(401);
     }
 
-    protected void addRefresh(String username, String refresh, long expiredMinute){
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, Math.toIntExact(expiredMinute));
-        Date date = calendar.getTime();
+    private void addRefreshEntity(String username, String refresh, Long expiredMs) {
 
-        RefreshEntity refreshEntity = new RefreshEntity();
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
+
+        Refresh refreshEntity = new Refresh();
         refreshEntity.setUsername(username);
         refreshEntity.setRefresh(refresh);
         refreshEntity.setExpiration(date.toString());
@@ -115,10 +111,14 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         refreshRepository.save(refreshEntity);
     }
 
-    Cookie createCookie(String key, String value){
+    private Cookie createCookie(String key, String value) {
+
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(12*60*60); // 12h
-        cookie.setHttpOnly(true);   //JS로 접근 불가, 탈취 위험 감소
+        cookie.setMaxAge(24*60*60);
+        //cookie.setSecure(true);
+        //cookie.setPath("/");
+        cookie.setHttpOnly(true);
+
         return cookie;
     }
 }

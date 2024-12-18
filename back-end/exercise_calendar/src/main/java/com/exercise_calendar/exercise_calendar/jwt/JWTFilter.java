@@ -2,9 +2,11 @@ package com.exercise_calendar.exercise_calendar.jwt;
 
 import com.exercise_calendar.exercise_calendar.dto.CustomUserDetails;
 import com.exercise_calendar.exercise_calendar.entity.User;
+import com.exercise_calendar.exercise_calendar.model.Role;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -23,74 +26,59 @@ public class JWTFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
+        // 헤더에서 access키에 담긴 토큰을 꺼냄
+        String accessToken = request.getHeader("access");
 
-        //request에서 Authorization 헤더를 찾음
-        String token= request.getHeader("Authorization");
+        // 토큰이 없다면 다음 필터로 넘김
+        // 토큰이 담기지 않았다는 것은 인증이 필요한 요청이 아닐 수 있기 때문
+                if (accessToken == null) {
 
-        //Autorization 헤더 검증
-        //JWT 토큰 없으면 다음 필터로 이동
-        if(token == null || !token.startsWith("Bearer ")) {
-            System.out.println("token null");
-            //토큰이 유효하지 않아 다음 필터로 값 전달
-            filterChain.doFilter(request, response);
+                    filterChain.doFilter(request, response);
 
-             //메소드 종료(필수)
-            return;
-        }
-        //Bearer 제거 후 순수 토큰만 획득
-        token = token.split(" ")[1];
+                    return;
+                }
 
-        //토큰 만료 검증
-        //JWT 만료 됐으면 다음 필터로 이동
-//        if(jwtUtil.isExpired(token)){
-//            System.out.println("token expired");
-//            filterChain.doFilter(request, response);
-//            //조건이 해당되면 메소드 종료(필수)
-//            return;
-//        }
+        // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
+                try {
+                    jwtUtil.isExpired(accessToken);
+                } catch (ExpiredJwtException e) {
 
-        try {
-            jwtUtil.isExpired(token);
-        } catch (ExpiredJwtException e) {
-            response.getWriter().write("access token is expired");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+                    //response body
+                    PrintWriter writer = response.getWriter();
+                    writer.print("access token expired");
 
-        String category = jwtUtil.getCategory(token);
+                    //response status code
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
 
-        // 카테고리 검사(access)
-        if (!category.equals("access")){
-            response.getWriter().write("invalid access token");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+        // 토큰이 access인지 확인 (발급시 페이로드에 명시)
+                String category = jwtUtil.getCategory(accessToken);
 
+                if (!category.equals("access")) {
 
-        //최종적으로 토큰 검증 완료
-        //토큰에서 username과 role 획득
-        String username = jwtUtil.getUsername(token);
-        String role = jwtUtil.getRole(token);
+                    //response body
+                    PrintWriter writer = response.getWriter();
+                    writer.print("invalid access token");
 
-        //검증된 user 정보 새로 생성
-        //user 엔티티를 생성하여 값 셋팅
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword("temppassword"); //임시 비번
-        user.setRole(role);
+                    //response status code
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
 
-        //UserDetails에 검증 완료된 회원 정보 전달
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
+        // username, role 값을 획득
+                String username = jwtUtil.getUsername(accessToken);
+                String role = jwtUtil.getRole(accessToken);
 
-        //Spring Security 컨텍스트에 인증된 사용자 정보 저장(Security 인증 토큰 생성)
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+                User userEntity = new User();
+                userEntity.setUsername(username);
+                userEntity.setRole(Role.valueOf(role));
+                CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
 
-        //세션에 사용자 등록
-        SecurityContextHolder.getContext().setAuthentication(authToken);
+                Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        // 필터 체인에서 다음 필터로 이동
-        //필터 체인?
-        filterChain.doFilter(request, response);
+                filterChain.doFilter(request, response);
     }
 }

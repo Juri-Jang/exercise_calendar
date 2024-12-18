@@ -1,9 +1,7 @@
 package com.exercise_calendar.exercise_calendar.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.exercise_calendar.exercise_calendar.model.Role;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -17,5 +15,6 @@ public class User {
     private String name;
     private String email;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;  // 기본 역할 설정
 }

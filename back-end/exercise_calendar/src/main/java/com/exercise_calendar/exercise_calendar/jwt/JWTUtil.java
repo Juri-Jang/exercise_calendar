@@ -1,6 +1,8 @@
 package com.exercise_calendar.exercise_calendar.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -40,11 +42,6 @@ public class JWTUtil {
     }
 
     public String createJwt(String category, String username, String role, Long expiredMs) {
-        // iat, exp를 위한 Date 및 Calendar
-        Calendar expCalendar = Calendar.getInstance();
-        expCalendar.add(Calendar.MINUTE, Math.toIntExact(expiredMs));
-        Date iatDate = new Date();
-        Date expDate = expCalendar.getTime();
 
         return Jwts.builder()
                 .claim("category", category)
@@ -55,4 +52,5 @@ public class JWTUtil {
                 .signWith(secretKey) //암호화 진행
                 .compact();
     }
+
 }

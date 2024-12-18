@@ -1,5 +1,6 @@
 package com.exercise_calendar.exercise_calendar.config;
 
+import com.exercise_calendar.exercise_calendar.jwt.CustomLogoutFilter;
 import com.exercise_calendar.exercise_calendar.jwt.JWTFilter;
 import com.exercise_calendar.exercise_calendar.jwt.JWTUtil;
 import com.exercise_calendar.exercise_calendar.jwt.LoginFilter;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -47,19 +49,23 @@ public class SecurityConfig {
                 .httpBasic((auth) -> auth.disable());
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/user/check-userid/**", "/user/register", "/login", "/user/profile", "/reissue").permitAll() //엔드포인트는 인증 없이 허용
+                        .requestMatchers("/user/check-userid/**", "/user/register", "/login", "/reissue", "/user/profile").permitAll()//엔드포인트는 인증 없이 허용
+//                        .requestMatchers("/user/profile").authenticated() // 인증 필요
                         .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 );
+
         http
-                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+                .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
 
         http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
+
+        http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));  //서버가 세션을 만들지 않도록 하고, 모든 요청은 JWT로 인증
-
 
         return http.build();
     }
