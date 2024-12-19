@@ -37,7 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             return new UserProfileResponseDto(
                     user.getUsername(),
                     user.getEmail(),
-                    user.getRole().name()
+                    user.getName()
             );
         }
         throw new IllegalArgumentException("Invalid user type");
