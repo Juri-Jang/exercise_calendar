@@ -6,7 +6,6 @@ import com.exercise_calendar.exercise_calendar.model.Role;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,8 +29,8 @@ public class JWTFilter extends OncePerRequestFilter {
         // 헤더에서 access키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
 
-        // 토큰이 없다면 다음 필터로 넘김
-        // 토큰이 담기지 않았다는 것은 인증이 필요한 요청이 아닐 수 있기 때문
+                // 토큰이 없다면 다음 필터로 넘김
+                // 토큰이 담기지 않았다는 것은 인증이 필요한 요청이 아닐 수 있기 때문
                 if (accessToken == null) {
 
                     filterChain.doFilter(request, response);
@@ -39,7 +38,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     return;
                 }
 
-        // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
+                // 토큰 만료 여부 확인, 만료시 다음 필터로 넘기지 않음
                 try {
                     jwtUtil.isExpired(accessToken);
                 } catch (ExpiredJwtException e) {
@@ -53,7 +52,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     return;
                 }
 
-        // 토큰이 access인지 확인 (발급시 페이로드에 명시)
+                // 토큰이 access인지 확인 (발급시 페이로드에 명시)
                 String category = jwtUtil.getCategory(accessToken);
 
                 if (!category.equals("access")) {
@@ -67,7 +66,7 @@ public class JWTFilter extends OncePerRequestFilter {
                     return;
                 }
 
-        // username, role 값을 획득
+                // username, role 값을 획득
                 String username = jwtUtil.getUsername(accessToken);
                 String role = jwtUtil.getRole(accessToken);
 

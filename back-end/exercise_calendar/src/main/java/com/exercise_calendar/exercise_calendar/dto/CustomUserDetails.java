@@ -13,14 +13,13 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(User user) {
         this.user = user;
+
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         Collection<GrantedAuthority> collection = new ArrayList<>();
         collection.add(new GrantedAuthority() {
-
             @Override
             public String getAuthority() {
                 return String.valueOf(user.getRole());
@@ -38,4 +37,17 @@ public class CustomUserDetails implements UserDetails {
     public String getUsername() {
         return user.getUsername();
     }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
+
+    public String getName() {
+        return user.getName();
+    }
+
+    public User getUser() {
+        return user;
+    }
+
 }

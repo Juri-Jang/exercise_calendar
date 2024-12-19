@@ -24,8 +24,6 @@ public class UserService {
             System.out.println("중복 검사를 완료 했습니다.");
             return false;
         }
-//        return userRepository.findByUserid(userid).isPresent();
-       //isPresent => Optional 클래스에서 제공하는 메소드로, Optional 객체에 값이 존재하면 true, 존재하지 않으면 false 반환
     }
 
     // 회원가입 로직
@@ -39,8 +37,4 @@ public class UserService {
         return "회원가입이 성공적으로 되었습니다.";
     }
 
-    //사용자 정보 가져오기
-    public User getUserProfile(String username){
-        return userRepository.findByUsername(username).orElse(null);
-    }
 }
