@@ -1,40 +1,138 @@
+import 'package:dio/dio.dart';
 import 'package:exercise_calendar/dto/LoginReqDto.dart';
 import 'package:exercise_calendar/dto/SignupReqDto.dart';
-import 'package:exercise_calendar/domain/service/storage_service.dart';
 import 'package:exercise_calendar/domain/user/user_provider.dart';
-import 'package:get/get_connect/http/src/response/response.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserRepository {
   final UserProvider _userProvider = UserProvider();
-  final StorageService _storageService = StorageService();
+  final _storage = new FlutterSecureStorage();
 
-  //로그인
-  Future<String?> login(String username, String password) async {
+  Future<bool?> login(String username, String password) async {
     try {
-      // 요청 데이터 생성
       LoginReqDto loginReqDto = LoginReqDto(username, password);
-      // API 호출
       Response response = await _userProvider.login(loginReqDto.toJson());
 
-      // 응답 처리
+      //로그인 성공시
       if (response.statusCode == 200) {
-        // Authorization 헤더에서 토큰 추출
-        final String? token = response.headers?["authorization"];
-        if (token != null) {
-          return token;
-        } else {
-          throw Exception('Authorization 헤더에 토큰이 없습니다.');
+        // 액세스 토큰 추출
+        final String? accessToken = response.headers.value("access");
+
+        // 리프레시 토큰 추출 (set-cookie 헤더에서)
+        final List<String>? cookies = response.headers['set-cookie'];
+        if (cookies != null) {
+          final refreshToken = _extractCookieValue(cookies, "refresh");
+          if (accessToken != null && refreshToken != null) {
+            // 액세스, 리프레쉬 토큰 저장
+            await _storage.write(key: 'ACCESS_TOKEN', value: accessToken);
+            print("액세스 토큰 저장 완료");
+            await _storage.write(key: 'REFRESH_TOKEN', value: refreshToken);
+            print("리프레쉬 토큰 저장 완료");
+
+            return true;
+          }
         }
+        throw Exception('토큰 정보가 없습니다.');
       } else {
-        print('로그인 실패: ${response.bodyString}');
-        return null;
+        print('로그인 실패: ${response.data}');
+        return false;
       }
     } catch (e) {
       print('로그인 요청 중 오류 발생: $e');
+      return null;
     }
   }
 
-  //회원가입
+// 쿠키 값 파싱 함수
+  String? _extractCookieValue(List<String> cookies, String key) {
+    for (String cookie in cookies) {
+      if (cookie.startsWith(key)) {
+        final parts = cookie.split(';').first.split('=');
+        if (parts.length == 2 && parts[0].trim() == key) {
+          return parts[1];
+        }
+      }
+    }
+    return null;
+  }
+
+  // 로그아웃(스토리지 토큰 삭제)
+  Future<void> logout() async {
+    // 액세스 토큰과 리프레시 토큰 삭제
+    await _storage.delete(key: 'ACCESS_TOKEN');
+    await _storage.delete(key: 'REFRESH_TOKEN');
+    print("로그아웃 완료, 토큰 삭제");
+  }
+
+  // 로그인 상태 확인
+  Future<bool> isLoggedIn() async {
+    // 액세스 토큰과 리프레시 토큰이 모두 존재하면 로그인 상태로 간주
+    final accessToken = await _storage.read(key: 'ACCESS_TOKEN');
+    final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
+    if (accessToken != null && refreshToken != null) {
+      return true;
+    }
+    return false;
+  }
+
+  // 리프레시 토큰을 이용해 새로운 액세스 토큰 갱신
+  Future<String?> reissueAccessToken() async {
+    try {
+      final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
+
+      if (refreshToken == null) {
+        throw Exception("리프레시 토큰이 없습니다.");
+      }
+
+      // 서버에 리프레시 토큰을 보내서 새로운 액세스 토큰 요청
+      Response response = await _userProvider.reissueToken(refreshToken);
+
+      if (response.statusCode == 200) {
+        final String? newAccessToken = response.headers.value("authorization");
+        if (newAccessToken != null) {
+          // 새로운 액세스 토큰을 저장합니다.
+          await _storage.write(key: 'ACCESS_TOKEN', value: newAccessToken);
+          return newAccessToken;
+        } else {
+          throw Exception('새로운 액세스 토큰이 없습니다.');
+        }
+      } else {
+        print('액세스 토큰 갱신 실패: ${response.data}');
+        return null;
+      }
+    } catch (e) {
+      print('액세스 토큰 갱신 중 오류 발생: $e');
+      return null;
+    }
+  }
+
+  // 사용자 정보 조회
+  Future getUserInfo() async {
+    final String? accessToken = await _storage.read(key: 'ACCESS_TOKEN');
+    final String? refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
+
+    if (accessToken == null || refreshToken == null) {
+      throw Exception("로그인 정보가 없습니다.");
+    }
+
+    final response = await _userProvider.getUserInfo(accessToken);
+    print('gsdgdsg ${response.statusCode}');
+    if (response.statusCode == 200) {
+      return response.data;
+    } else {
+      // 액세스 토큰 만료 시 리프레시 토큰을 통해 새 액세스 토큰을 발급받도록 처리
+      if (response.statusCode == 401) {
+        final newToken = await reissueAccessToken();
+        if (newToken != null) {
+          // 새로운 액세스 토큰으로 다시 시도
+          return await _userProvider.getUserInfo(newToken);
+        }
+      }
+      throw Exception("사용자 정보 불러오기 실패: ${response.data}");
+    }
+  }
+
+  // 회원가입
   Future<void> signup(
       String name, String username, String password, String email) async {
     try {
@@ -44,7 +142,7 @@ class UserRepository {
       // API 호출
       Response response = await _userProvider.register(signupReqDto.toJson());
       if (response.statusCode != 201) {
-        throw Exception('회원가입 실패: ${response.bodyString}');
+        throw Exception('회원가입 실패: ${response.data}');
       }
       print('회원가입 성공');
     } catch (e) {
@@ -52,28 +150,13 @@ class UserRepository {
     }
   }
 
-  //ID 중복 확인
+  // ID 중복 확인
   Future<bool> isUseridTaken(String userid) async {
     try {
       return await _userProvider.isUseridTaken(userid);
     } catch (e) {
       print('ID 중복 확인 중 오류 발생: $e');
       return false;
-    }
-  }
-
-  //마이페이지
-  Future<Map<String, dynamic>> getUserInfo() async {
-    final String? token = await _storageService.getToken();
-
-    if (token == null) {
-      throw Exception("로그인 정보가 없습니다.");
-    }
-    final response = await _userProvider.getUserInfo(token);
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      throw Exception("사용자 정보 불러오기 실패: ${response.bodyString}");
     }
   }
 }

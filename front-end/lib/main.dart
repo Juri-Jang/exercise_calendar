@@ -1,5 +1,5 @@
 import 'package:exercise_calendar/controllers/user_controller.dart';
-import 'package:exercise_calendar/domain/service/auth_service.dart';
+import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
 import 'package:exercise_calendar/view/pages/user/login.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +14,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final AuthService _authService = AuthService();
-
+  UserRepository _userRepository = UserRepository();
   MyApp({super.key});
 
   @override
@@ -26,7 +25,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: FutureBuilder<bool>(
-        future: _authService.isLoggedIn(),
+        future: _userRepository.isLoggedIn(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

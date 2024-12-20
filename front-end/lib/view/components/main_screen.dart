@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 class MainScreen extends StatelessWidget {
-  final MainScreenController controller = Get.put(MainScreenController());
+  final MainScreenController _controller = Get.put(MainScreenController());
 
   final List<Widget> _screens = [
     ExerciseCalender(), // 캘린더 화면
@@ -18,11 +18,11 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(() => _screens[controller.selectedIndex.value]),
+      body: Obx(() => _screens[_controller.selectedIndex.value]),
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
-          currentIndex: controller.selectedIndex.value,
-          onTap: controller.onItemTapped,
+          currentIndex: _controller.selectedIndex.value,
+          onTap: _controller.onItemTapped,
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today),
