@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/controllers/user_controller.dart';
+import 'package:exercise_calendar/view/controllers/user_controller.dart';
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
 import 'package:exercise_calendar/view/pages/user/login.dart';

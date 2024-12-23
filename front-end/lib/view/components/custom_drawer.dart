@@ -1,7 +1,7 @@
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:exercise_calendar/controllers/user_controller.dart';
+import 'package:exercise_calendar/view/controllers/user_controller.dart';
 import 'package:exercise_calendar/view/pages/user/login.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

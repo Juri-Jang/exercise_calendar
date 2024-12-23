@@ -1,5 +1,6 @@
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 
@@ -9,6 +10,7 @@ class UserController extends GetxController {
   var name = "Guest".obs;
   var email = "guest@example.com".obs;
   final _storage = new FlutterSecureStorage();
+
   @override
   void onInit() {
     super.onInit();
@@ -35,9 +37,10 @@ class UserController extends GetxController {
     }
   }
 
-  Future<void> login(String username, String password) async {
+  Future<void> login(
+      BuildContext context, String username, String password) async {
     //로그인 로직 수행 후 토큰 저장
-    bool? result = await _userRepository.login(username, password);
+    bool? result = await _userRepository.login(context, username, password);
 
     if (result == true) {
       //사용자 정보 불러옴(마이페이지 반영)

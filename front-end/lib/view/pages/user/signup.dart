@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/controllers/signupController.dart';
+import 'package:exercise_calendar/view/controllers/signupController.dart';
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/pages/user/login.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/controllers/exercise_controller.dart';
+import 'package:exercise_calendar/view/controllers/exercise_controller.dart';
 import 'package:exercise_calendar/view/components/custom_appbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
