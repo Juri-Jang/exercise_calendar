@@ -15,6 +15,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   UserRepository _userRepository = UserRepository();
+  UserController _uc = UserController();
   MyApp({super.key});
 
   @override
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: FutureBuilder<bool>(
-        future: _userRepository.isLoggedIn(),
+        future: loadUserInfoWithDelay(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -34,5 +35,10 @@ class MyApp extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<bool> loadUserInfoWithDelay() async {
+    await Future.delayed(Duration(milliseconds: 200)); // 200ms 지연
+    return Get.find<UserController>().loadUserInfo();
   }
 }

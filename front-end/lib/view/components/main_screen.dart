@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/controllers/main_controller.dart';
+import 'package:exercise_calendar/view/controllers/main_controller.dart';
 import 'package:exercise_calendar/view/pages/post/exercise_calender.dart';
 import 'package:exercise_calendar/view/pages/post/exercise_history.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
 class MainScreen extends StatelessWidget {
-  final MainScreenController _controller = Get.put(MainScreenController());
+  final MainScreenController _mc = Get.put(MainScreenController());
 
   final List<Widget> _screens = [
     ExerciseCalender(), // 캘린더 화면
@@ -18,11 +18,11 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(() => _screens[_controller.selectedIndex.value]),
+      body: Obx(() => _screens[_mc.selectedIndex.value]),
       bottomNavigationBar: Obx(
         () => BottomNavigationBar(
-          currentIndex: _controller.selectedIndex.value,
-          onTap: _controller.onItemTapped,
+          currentIndex: _mc.selectedIndex.value,
+          onTap: _mc.onItemTapped,
           items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today),

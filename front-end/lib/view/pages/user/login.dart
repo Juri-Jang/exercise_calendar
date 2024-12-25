@@ -1,4 +1,4 @@
-import 'package:exercise_calendar/controllers/user_controller.dart';
+import 'package:exercise_calendar/view/controllers/user_controller.dart';
 import 'package:exercise_calendar/view/pages/user/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -117,7 +117,7 @@ class Login extends StatelessWidget {
                             onPressed: () {
                               // 로그인 시도
                               if (_formKey.currentState!.validate()) {
-                                u.login(username.text, password.text);
+                                u.login(context, username.text, password.text);
                               }
                             },
                             child: Text(' 로그인'),

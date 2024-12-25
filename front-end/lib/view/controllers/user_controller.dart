@@ -9,49 +9,71 @@ class UserController extends GetxController {
 
   var name = "Guest".obs;
   var email = "guest@example.com".obs;
-  final _storage = new FlutterSecureStorage();
+  final _storage = FlutterSecureStorage();
 
   @override
   void onInit() {
     super.onInit();
-    _loadUserInfo();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      loadUserInfo(); // 앱 시작 시 사용자 정보 로드
+    });
     printSecureStorage();
+    print('로드~~~~');
   }
 
   void printSecureStorage() async {
-    // 모든 데이터 읽기
     Map<String, String> allValues = await _storage.readAll();
-
-    // 콘솔에 출력
-    print('hihi : $allValues');
+    print(allValues); // 데이터를 확인하기 위해 추가
   }
 
-  Future<void> _loadUserInfo() async {
+  // 로그인 상태 확인 및 사용자 정보 로딩
+  Future<bool> loadUserInfo() async {
+    if (Get.context != null) {
+      final isLoggedIn = await _userRepository.isLoggedIn(Get.context!);
+      if (isLoggedIn) {
+        await _fetchAndSetUserInfo(); // 로그인 상태라면 사용자 정보 로드
+        return true;
+      } else {
+        print('로그인 정보 없음');
+        return false;
+      }
+    } else {
+      print("Get.context is null");
+      return false;
+    }
+  }
+
+  // 사용자 정보를 가져와서 저장하는 함수 (로그인/앱 시작 시 공통)
+  Future<void> _fetchAndSetUserInfo() async {
     try {
-      // 로그인 상태라면 사용자 정보를 로드
-      final userInfo = await _userRepository.getUserInfo();
-      name.value = userInfo['name'] ?? "Guest";
-      email.value = userInfo['email'] ?? "guest@example.com";
+      final userInfo = await _userRepository.getUserInfo(Get.context!);
+      name.value = userInfo['name'] ?? 'Guest'; // null 값 처리
+      email.value = userInfo['email'] ?? 'guest@example.com'; // null 값 처리
+      print('name : ${name.value}');
+      print('email : ${email.value}');
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
     }
   }
 
-  Future<void> login(
+  // 로그인 함수 - 로그인 후 사용자 정보를 가져오기
+  Future<bool?> login(
       BuildContext context, String username, String password) async {
-    //로그인 로직 수행 후 토큰 저장
-    bool? result = await _userRepository.login(context, username, password);
+    try {
+      bool? result = await _userRepository.login(context, username, password);
 
-    if (result == true) {
-      //사용자 정보 불러옴(마이페이지 반영)
-      Map<String, dynamic> response = await _userRepository.getUserInfo();
-      name.value = response['name'];
-      email.value = response['email'];
-
-      Get.snackbar('로그인 성공', '$username님 반갑습니다!');
-      Get.to(() => MainScreen());
-    } else {
-      Get.snackbar('로그인 실패', '아이디 또는 패스워드를 확인해주세요');
+      if (result == true) {
+        await _fetchAndSetUserInfo(); // 로그인 후 사용자 정보 가져오기
+        Get.snackbar('로그인 성공', '$username님 반갑습니다!');
+        Get.to(() => MainScreen());
+        return true;
+      } else {
+        Get.snackbar('로그인 실패', '아이디 또는 패스워드를 확인해주세요');
+        return false;
+      }
+    } catch (e) {
+      print('로그인 실패: $e');
+      return false;
     }
   }
 }

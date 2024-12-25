@@ -2,16 +2,24 @@ import 'package:dio/dio.dart';
 import 'package:exercise_calendar/dto/LoginReqDto.dart';
 import 'package:exercise_calendar/dto/SignupReqDto.dart';
 import 'package:exercise_calendar/domain/user/user_provider.dart';
+import 'package:exercise_calendar/view/controllers/user_controller.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/get_instance.dart';
 
 class UserRepository {
   final UserProvider _userProvider = UserProvider();
   final _storage = new FlutterSecureStorage();
+  //final UserController _uc = Get.find<UserController>();
+  //final UserController _uc = Get.put(UserController());
 
-  Future<bool?> login(String username, String password) async {
+  Future<bool?> login(
+      BuildContext context, String username, String password) async {
     try {
       LoginReqDto loginReqDto = LoginReqDto(username, password);
-      Response response = await _userProvider.login(loginReqDto.toJson());
+      Response response =
+          await _userProvider.login(context, loginReqDto.toJson());
 
       //로그인 성공시
       if (response.statusCode == 200) {
@@ -58,17 +66,26 @@ class UserRepository {
 
   // 로그아웃(스토리지 토큰 삭제)
   Future<void> logout() async {
-    // 액세스 토큰과 리프레시 토큰 삭제
-    await _storage.delete(key: 'ACCESS_TOKEN');
-    await _storage.delete(key: 'REFRESH_TOKEN');
-    print("로그아웃 완료, 토큰 삭제");
+    final String? refresh = await _storage.read(key: 'REFRESH_TOKEN');
+    final _logout = await _userProvider.logout(refresh!);
+    try {
+      if (_logout.statusCode == 200) {
+        // storage의 액세스 토큰과 리프레시 토큰 삭제
+        await _storage.delete(key: 'ACCESS_TOKEN');
+        await _storage.delete(key: 'REFRESH_TOKEN');
+        print("로그아웃 완료, 토큰 삭제");
+      }
+    } catch (e) {
+      print("로그아웃 에러 : $e");
+    }
   }
 
   // 로그인 상태 확인
-  Future<bool> isLoggedIn() async {
+  Future<bool> isLoggedIn(BuildContext context) async {
     // 액세스 토큰과 리프레시 토큰이 모두 존재하면 로그인 상태로 간주
     final accessToken = await _storage.read(key: 'ACCESS_TOKEN');
     final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
+    print('액세스 : $accessToken, 리프래쉬 : $refreshToken ');
     if (accessToken != null && refreshToken != null) {
       return true;
     }
@@ -76,38 +93,38 @@ class UserRepository {
   }
 
   // 리프레시 토큰을 이용해 새로운 액세스 토큰 갱신
-  Future<String?> reissueAccessToken() async {
-    try {
-      final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
+  // Future<String?> reissueAccessToken() async {
+  //   try {
+  //     final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
 
-      if (refreshToken == null) {
-        throw Exception("리프레시 토큰이 없습니다.");
-      }
+  //     if (refreshToken == null) {
+  //       throw Exception("리프레시 토큰이 없습니다.");
+  //     }
 
-      // 서버에 리프레시 토큰을 보내서 새로운 액세스 토큰 요청
-      Response response = await _userProvider.reissueToken(refreshToken);
+  //     // 서버에 리프레시 토큰을 보내서 새로운 액세스 토큰 요청
+  //     Response response = await _userProvider.reissueToken(refreshToken);
 
-      if (response.statusCode == 200) {
-        final String? newAccessToken = response.headers.value("authorization");
-        if (newAccessToken != null) {
-          // 새로운 액세스 토큰을 저장합니다.
-          await _storage.write(key: 'ACCESS_TOKEN', value: newAccessToken);
-          return newAccessToken;
-        } else {
-          throw Exception('새로운 액세스 토큰이 없습니다.');
-        }
-      } else {
-        print('액세스 토큰 갱신 실패: ${response.data}');
-        return null;
-      }
-    } catch (e) {
-      print('액세스 토큰 갱신 중 오류 발생: $e');
-      return null;
-    }
-  }
+  //     if (response.statusCode == 200) {
+  //       final String? newAccessToken = response.headers.value("authorization");
+  //       if (newAccessToken != null) {
+  //         // 새로운 액세스 토큰을 저장합니다.
+  //         await _storage.write(key: 'ACCESS_TOKEN', value: newAccessToken);
+  //         return newAccessToken;
+  //       } else {
+  //         throw Exception('새로운 액세스 토큰이 없습니다.');
+  //       }
+  //     } else {
+  //       print('액세스 토큰 갱신 실패: ${response.data}');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print('액세스 토큰 갱신 중 오류 발생: $e');
+  //     return null;
+  //   }
+  // }
 
   // 사용자 정보 조회
-  Future getUserInfo() async {
+  Future getUserInfo(BuildContext context) async {
     final String? accessToken = await _storage.read(key: 'ACCESS_TOKEN');
     final String? refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
 
@@ -115,19 +132,18 @@ class UserRepository {
       throw Exception("로그인 정보가 없습니다.");
     }
 
-    final response = await _userProvider.getUserInfo(accessToken);
-    print('gsdgdsg ${response.statusCode}');
+    final response = await _userProvider.getUserInfo(context);
     if (response.statusCode == 200) {
       return response.data;
     } else {
       // 액세스 토큰 만료 시 리프레시 토큰을 통해 새 액세스 토큰을 발급받도록 처리
-      if (response.statusCode == 401) {
-        final newToken = await reissueAccessToken();
-        if (newToken != null) {
-          // 새로운 액세스 토큰으로 다시 시도
-          return await _userProvider.getUserInfo(newToken);
-        }
-      }
+      // if (response.statusCode == 401) {
+      //   final newToken = await reissueAccessToken();
+      //   if (newToken != null) {
+      //     // 새로운 액세스 토큰으로 다시 시도
+      //     return await _userProvider.getUserInfo(newToken);
+      //   }
+      // }
       throw Exception("사용자 정보 불러오기 실패: ${response.data}");
     }
   }
