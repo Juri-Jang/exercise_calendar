@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_secure_storage-9.2.2/android" />
+    <file type="web" url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/path_provider_android-2.2.4/android" />
+    <file type="web" url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/shared_preferences_android-2.2.2/android" />
     <file type="web" url="file://$PROJECT_DIR$/back-end/exercise_calendar" />
     <file type="web" url="file://$PROJECT_DIR$/front-end/android" />
     <file type="web" url="file://$USER_HOME$/development/flutter/packages/flutter_tools/gradle" />
