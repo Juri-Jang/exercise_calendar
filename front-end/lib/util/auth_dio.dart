@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:exercise_calendar/util/constants.dart';
 import 'package:exercise_calendar/view/pages/user/login.dart';
+import 'package:get/get.dart';
 
 Future authDio(BuildContext context) async {
   var dio = Dio();
@@ -16,10 +17,11 @@ Future authDio(BuildContext context) async {
     onRequest: (options, handler) async {
       final accessToken = await storage.read(key: 'ACCESS_TOKEN');
       options.baseUrl = BASE_URL; // 기본 URL 설정
-      options.headers = {
+      options.headers.addAll({
         'access': accessToken,
         'Content-Type': 'application/json',
-      };
+      });
+      print('Request Headers: ${options.headers}'); // 헤더 로그 출력
       return handler.next(options); // 요청을 계속 진행
     },
 
@@ -31,8 +33,7 @@ Future authDio(BuildContext context) async {
         if (refreshToken == null) {
           // 리프레시 토큰이 없으면 로그아웃 처리 후 로그인 화면으로 이동
           await storage.deleteAll();
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => Login()));
+          Get.offAll(() => Login()); // GetX를 사용한 화면 이동
           return;
         }
 
@@ -81,8 +82,7 @@ Future authDio(BuildContext context) async {
         } catch (e) {
           // 리프레시 토큰 재발급 실패 시 처리
           await storage.deleteAll();
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => Login()));
+          Get.offAll(() => Login());
           return;
         }
       }

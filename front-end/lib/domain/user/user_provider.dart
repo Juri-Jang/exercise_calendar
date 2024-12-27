@@ -36,6 +36,24 @@ class UserProvider {
     }
   }
 
+  Future<Response> validateToken(BuildContext context, String refresh) async {
+    try {
+      final Dio _dio = await authDio(context);
+      final response = await _dio.get(
+        "/user/validateToken",
+        options: Options(
+          headers: {
+            'X-Refresh-Token': refresh, // 리프레시 토큰 전달
+          },
+        ),
+      );
+      return response;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<Response> logout(String refresh) async {
     try {
       Response response = await _dio.post(
@@ -53,20 +71,6 @@ class UserProvider {
       rethrow;
     }
   }
-  // 리프레시 토큰을 이용하여 새로운 액세스 토큰 발급
-  // Future<Response> reissueToken(String refreshToken) async {
-  //   try {
-  //     Response response = await _dio.post(
-  //       "$BASE_URL/reissue", // 리프레시 토큰을 받아 새로운 액세스 토큰을 발급하는 API
-  //       options: Options(
-  //         headers: {'Content-Type': 'application/json'}, // 헤더 설정
-  //       ),
-  //     );
-  //     return response;
-  //   } catch (e) {
-  //     rethrow; // 에러를 호출한 곳으로 다시 던짐
-  //   }
-  // }
 
   // 회원가입 요청
   Future<Response> register(Map<String, dynamic> data) async {
@@ -83,7 +87,7 @@ class UserProvider {
   }
 
   // ID 중복 확인
-  Future<bool> isUseridTaken(String username) async {
+  Future<bool> isUseridTaken(String username, [String? refreshToken]) async {
     try {
       Response response = await _dio.get(
         "$BASE_URL/user/check-userid/$username",
