@@ -33,6 +33,7 @@ Future authDio(BuildContext context) async {
         if (refreshToken == null) {
           // 리프레시 토큰이 없으면 로그아웃 처리 후 로그인 화면으로 이동
           await storage.deleteAll();
+          Get.snackbar('로그인 인증 만료', '로그인 인증이 만료 되었습니다. 다시 로그인해주세요!');
           Get.offAll(() => Login()); // GetX를 사용한 화면 이동
           return;
         }
@@ -82,6 +83,7 @@ Future authDio(BuildContext context) async {
         } catch (e) {
           // 리프레시 토큰 재발급 실패 시 처리
           await storage.deleteAll();
+          Get.snackbar('로그인 인증 만료', '로그인 인증이 만료 되었습니다. 다시 로그인해주세요!');
           Get.offAll(() => Login());
           return;
         }

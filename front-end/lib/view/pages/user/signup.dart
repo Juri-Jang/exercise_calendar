@@ -179,10 +179,7 @@ class Signup extends StatelessWidget {
                                   // 회원가입 완료 로직
                                   ur.signup(name.text, username.text,
                                       password.text, email.text);
-                                  Get.snackbar(
-                                      '회원가입 성공', '회원가입이 완료 됐습니다. 로그인을 진행해주세요!');
                                   signupController.init();
-                                  Get.to(() => Login());
                                 }
                               }
                             : null, // 비밀번호가 일치하지 않으면 버튼 비활성화

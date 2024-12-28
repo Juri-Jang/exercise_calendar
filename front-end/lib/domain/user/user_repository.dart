@@ -2,14 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:exercise_calendar/dto/LoginReqDto.dart';
 import 'package:exercise_calendar/dto/SignupReqDto.dart';
 import 'package:exercise_calendar/domain/user/user_provider.dart';
+import 'package:exercise_calendar/view/pages/user/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/instance_manager.dart';
 
 class UserRepository {
   final UserProvider _userProvider = UserProvider();
   final _storage = new FlutterSecureStorage();
-  //final UserController _uc = Get.find<UserController>();
-  //final UserController _uc = Get.put(UserController());
 
   Future<bool?> login(
       BuildContext context, String username, String password) async {
@@ -120,12 +121,14 @@ class UserRepository {
       // 요청 데이터 생성
       SignupReqDto signupReqDto = SignupReqDto(username, password, name, email);
 
-      // API 호출
-      Response response = await _userProvider.register(signupReqDto.toJson());
-      if (response.statusCode != 201) {
+      Response response = await _userProvider.signup(signupReqDto.toJson());
+      if (response.statusCode == 200) {
+        print('회원가입 성공');
+        Get.snackbar('회원가입 성공', '회원가입이 완료 됐습니다. 로그인을 진행해주세요!');
+        Get.to(() => Login());
+      } else {
         throw Exception('회원가입 실패: ${response.data}');
       }
-      print('회원가입 성공');
     } catch (e) {
       print('회원가입 요청 중 오류 발생: $e');
     }
