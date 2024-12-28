@@ -73,10 +73,10 @@ class UserProvider {
   }
 
   // 회원가입 요청
-  Future<Response> register(Map<String, dynamic> data) async {
+  Future<Response> signup(Map<String, dynamic> data) async {
     try {
       Response response = await _dio.post(
-        "$BASE_URL/user/register",
+        "$BASE_URL/user/signup",
         data: data,
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
