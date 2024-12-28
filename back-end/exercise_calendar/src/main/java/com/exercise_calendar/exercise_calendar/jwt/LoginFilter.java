@@ -88,6 +88,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //응답 설정
         response.setHeader("access", access); //응답 헤더에 설정
         response.addCookie(createCookie("refresh", refresh)); //응답 쿠키에 설정
+        response.getWriter().write("login success");
         response.setStatus(HttpStatus.OK.value());
     }
 
@@ -95,7 +96,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //로그인 실패
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws java.io.IOException {
-        response.getWriter().write("{\"message\":\"fail\"}");
+        response.getWriter().write("{\"message\":\"login fail\"}");
         response.setStatus(401);
     }
 
