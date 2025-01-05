@@ -16,6 +16,10 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @ManyToOne(fetch = FetchType.LAZY) //지연 로딩 방식
+    @JoinColumn(name = "writer_id", nullable = false)
+    private User writer;
+
     @Column(nullable = false)
     private String category;
 
@@ -25,18 +29,19 @@ public class Exercise {
     @Column(nullable = false)
     private LocalTime endTime;
 
-    @Column(nullable = true)
+    @Column
     private String description;
 
     @Column(nullable = false)
     private int rating;
 
     @CreationTimestamp
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createTime;
 
 
-    public Exercise(String category, LocalTime startTime, LocalTime endTime, String description, int rating) {
+    public Exercise(User writer, String category, LocalTime startTime, LocalTime endTime, String description, int rating) {
+        this.writer = writer;
         this.category = category;
         this.startTime = startTime;
         this.endTime = endTime;

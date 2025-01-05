@@ -3,6 +3,7 @@ package com.exercise_calendar.exercise_calendar.jwt;
 import com.exercise_calendar.exercise_calendar.dto.CustomUserDetails;
 import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.model.Role;
+import com.exercise_calendar.exercise_calendar.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,10 +16,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Optional;
 
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
+
 
     public JWTFilter(JWTUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
@@ -70,10 +73,12 @@ public class JWTFilter extends OncePerRequestFilter {
                 String username = jwtUtil.getUsername(accessToken);
                 String role = jwtUtil.getRole(accessToken);
 
+                // username을 통해 User 객체 조회
                 User userEntity = new User();
                 userEntity.setUsername(username);
                 userEntity.setRole(Role.valueOf(role));
                 CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
+
 
                 Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authToken);

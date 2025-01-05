@@ -1,7 +1,7 @@
 package com.exercise_calendar.exercise_calendar.service;
 
 import com.exercise_calendar.exercise_calendar.dto.CustomUserDetails;
-import com.exercise_calendar.exercise_calendar.dto.UserProfileResponseDto;
+import com.exercise_calendar.exercise_calendar.dto.UserProfileResDto;
 import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,19 +26,41 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(userData);
     }
 
-    //사용자 정보 조회
-    public UserProfileResponseDto getUserProfile(String username) {
+
+    // 사용자 조회 - User 객체 반환
+    private User getUserByUsername(String username) {
+        UserDetails userDetails = loadUserByUsername(username);
+        if (userDetails instanceof CustomUserDetails) {
+            return ((CustomUserDetails) userDetails).getUser();
+        }
+        throw new IllegalArgumentException("Invalid user type");
+    }
+
+
+    // 사용자 로그인 조회
+    public User getUser(String username) {
+        UserDetails userData = loadUserByUsername(username);
+
+        if (userData instanceof CustomUserDetails) {
+            CustomUserDetails customUserDetails = (CustomUserDetails) userData;
+            return customUserDetails.getUser();  // User 객체 반환
+        }
+        throw new IllegalArgumentException("Invalid user type");
+    }
+
+    //사용자 프로필 조회
+    public UserProfileResDto getUserProfile(String username) {
         UserDetails userData = loadUserByUsername(username);
 
         if (userData instanceof CustomUserDetails) {
             CustomUserDetails customUserDetails = (CustomUserDetails) userData;
             User user = customUserDetails.getUser();
 
-            return new UserProfileResponseDto(
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getName()
-            );
+            return UserProfileResDto.builder()
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .build();
         }
         throw new IllegalArgumentException("Invalid user type");
     }
