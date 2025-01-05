@@ -1,10 +1,9 @@
 package com.exercise_calendar.exercise_calendar.controller;
 
-import com.exercise_calendar.exercise_calendar.dto.UserProfileResponseDto;
+import com.exercise_calendar.exercise_calendar.dto.UserProfileResDto;
 import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.jwt.JWTUtil;
 import com.exercise_calendar.exercise_calendar.repository.RefreshRepository;
-import com.exercise_calendar.exercise_calendar.repository.UserRepository;
 import com.exercise_calendar.exercise_calendar.service.CustomUserDetailsService;
 import com.exercise_calendar.exercise_calendar.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -50,12 +49,12 @@ public class UserController {
 
     @GetMapping("/profile")
     @ResponseBody
-    public ResponseEntity<UserProfileResponseDto> getUserProfile() {
+    public ResponseEntity<UserProfileResDto> getUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName(); // 현재 인증된 사용자의 이름 가져오기
 
         try {
-            UserProfileResponseDto userProfile = customUserDetailsService.getUserProfile(username);
+            UserProfileResDto userProfile = customUserDetailsService.getUserProfile(username);
             return ResponseEntity.ok(userProfile);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
