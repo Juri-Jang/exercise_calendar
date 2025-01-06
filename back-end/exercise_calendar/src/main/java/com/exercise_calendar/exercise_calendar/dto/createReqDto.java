@@ -10,7 +10,7 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExerciseReqDto {
+public class createReqDto {
     private Long writerId;
     private String category;
     private LocalTime startTime;
