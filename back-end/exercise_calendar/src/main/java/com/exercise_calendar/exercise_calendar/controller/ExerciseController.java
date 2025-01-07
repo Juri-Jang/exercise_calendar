@@ -30,9 +30,9 @@ public class ExerciseController {
 
     //운동 전체 조회
     @GetMapping("/getAll/{username}")
-    public ResponseEntity<?> getAllExercises(@PathVariable String username) {
+    public ResponseEntity<?> getAllExercises(@PathVariable String username, @RequestParam(required = false) String sortBy) {
         try {
-            GetAllResDto response = exerciseService.getAllExercises(username);
+            GetAllResDto response = exerciseService.getAllExercises(username, sortBy);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

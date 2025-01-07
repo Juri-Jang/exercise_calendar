@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,13 +53,31 @@ public class ExerciseService {
                 .build();
     }
 
-    public GetAllResDto getAllExercises(String username){
+    /*
+    전체 운동 기록 조회 (정렬 필터 적용)
+    1. 최신 날짜순(latest, 기본값)
+    2. 평점 높은순(highestRating)
+    3. 오래된 날짜순(oldest)
+    */
+    public GetAllResDto getAllExercises(String username, String sortBy){
         User user = customUserDetailsService.getUser(username);
-
         List<Exercise> exercises = exerciseRepository.findByUser(user);
 
+        // 기본값을 최신 날짜순으로 설정하고, sortBy가 없으면 latest로 처리
+        Comparator<Exercise> comparator = Comparator.comparing(Exercise::getCreateTime).reversed(); // 기본값: 최신 날짜순
+
+        if ("highestRating".equals(sortBy)) {
+            comparator = Comparator.comparingInt(Exercise::getRating).reversed(); // 평점 높은 순
+        } else if ("oldest".equals(sortBy)) {
+            comparator = Comparator.comparing(Exercise::getCreateTime, Comparator.nullsFirst(Comparator.naturalOrder())); // 오래된 날짜 순
+        }
+
+        List<Exercise> sortedExercises = exercises.stream()
+                .sorted(comparator) // 선택된 comparator로 정렬
+                .collect(Collectors.toList());
+
         return GetAllResDto.builder()
-                .exercises(exercises.stream()
+                .exercises(sortedExercises.stream()
                         .map(exercise -> GetAllResDto.ExerciseDto.builder()
                                 .id(exercise.getId())
                                 .category(exercise.getCategory())
@@ -70,6 +89,7 @@ public class ExerciseService {
 
     }
 
+    //날짜별 운동 조회
     public GetByDateResDto getExerciseByDate(GetByDateReqDto dto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -89,6 +109,8 @@ public class ExerciseService {
                 .build();
     }
 
+
+    //운동 상세 조회
     public GetDetailsResDto getExerciseDetails(long id) throws AccessDeniedException {
         Exercise exercise = exerciseRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("해당 운동 정보가 없습니다."));
