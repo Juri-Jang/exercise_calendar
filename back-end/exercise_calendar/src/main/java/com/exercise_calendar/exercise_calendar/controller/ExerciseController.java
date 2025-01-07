@@ -28,6 +28,20 @@ public class ExerciseController {
         }
     }
 
+    //운동 전체 조회
+    @GetMapping("/getAll/{username}")
+    public ResponseEntity<?> getAllExercises(@PathVariable String username) {
+        try {
+            GetAllResDto response = exerciseService.getAllExercises(username);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러가 발생했습니다.");
+        }
+    }
+
+    //날짜별 운동 조회
     @GetMapping("/getByDate")
     public ResponseEntity<?> getExerciseByDate(@RequestParam LocalDate date) {
         try {
@@ -41,6 +55,7 @@ public class ExerciseController {
         }
     }
 
+    //운동 상세 조회
     @GetMapping("/details/{id}")
     public ResponseEntity<?> getExerciseDetails(@PathVariable Long id) {
         try{

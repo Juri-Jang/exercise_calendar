@@ -5,7 +5,6 @@ import com.exercise_calendar.exercise_calendar.entity.Exercise;
 import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.repository.ExerciseRepository;
 import com.exercise_calendar.exercise_calendar.repository.UserRepository;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,6 +52,24 @@ public class ExerciseService {
                 .build();
     }
 
+    public GetAllResDto getAllExercises(String username){
+        User user = customUserDetailsService.getUser(username);
+
+        List<Exercise> exercises = exerciseRepository.findByUser(user);
+
+        return GetAllResDto.builder()
+                .exercises(exercises.stream()
+                        .map(exercise -> GetAllResDto.ExerciseDto.builder()
+                                .id(exercise.getId())
+                                .category(exercise.getCategory())
+                                .createTime(LocalDate.from(exercise.getCreateTime()))
+                                .rating(exercise.getRating())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
+
+    }
+
     public GetByDateResDto getExerciseByDate(GetByDateReqDto dto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -62,7 +79,6 @@ public class ExerciseService {
 
         List<Exercise> exercises = exerciseRepository.findByWriterAndDate(user, date);
 
-        // 결과 변환
         return GetByDateResDto.builder()
                 .exercises(exercises.stream()
                         .map(exercise -> GetByDateResDto.ExerciseDto.builder()
