@@ -1,9 +1,6 @@
 package com.exercise_calendar.exercise_calendar.service;
 
-import com.exercise_calendar.exercise_calendar.dto.createReqDto;
-import com.exercise_calendar.exercise_calendar.dto.createResDto;
-import com.exercise_calendar.exercise_calendar.dto.exerciseByDateReqDto;
-import com.exercise_calendar.exercise_calendar.dto.exerciseByDateResDto;
+import com.exercise_calendar.exercise_calendar.dto.*;
 import com.exercise_calendar.exercise_calendar.entity.Exercise;
 import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.repository.ExerciseRepository;
@@ -13,8 +10,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +29,7 @@ public class ExerciseService {
     private CustomUserDetailsService  customUserDetailsService;
 
 
-    public createResDto create(createReqDto dto) {
+    public CreateResDto create(CreateReqDto dto) {
         // SecurityContext에서 현재 로그인한 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -44,7 +46,7 @@ public class ExerciseService {
 
         exerciseRepository.save(exercise);
 
-        return createResDto.builder()
+        return CreateResDto.builder()
                 .category(exercise.getCategory())
                 .startTime(exercise.getStartTime())
                 .endTime(exercise.getEndTime())
@@ -53,7 +55,7 @@ public class ExerciseService {
                 .build();
     }
 
-    public exerciseByDateResDto getExerciseByDate(exerciseByDateReqDto dto) {
+    public GetByDateResDto getExerciseByDate(GetByDateReqDto dto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = customUserDetailsService.getUser(username);
@@ -63,9 +65,9 @@ public class ExerciseService {
         List<Exercise> exercises = exerciseRepository.findByWriterAndDate(user, date);
 
         // 결과 변환
-        return exerciseByDateResDto.builder()
+        return GetByDateResDto.builder()
                 .exercises(exercises.stream()
-                        .map(exercise -> exerciseByDateResDto.ExerciseDto.builder()
+                        .map(exercise -> GetByDateResDto.ExerciseDto.builder()
                                 .id(exercise.getId())
                                 .category(exercise.getCategory())
                                 .build())
@@ -73,4 +75,27 @@ public class ExerciseService {
                 .build();
     }
 
+    public GetDetailsResDto getExerciseDetails(long id) throws AccessDeniedException {
+        Exercise exercise = exerciseRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("운동 정보가 없습니다."));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = customUserDetailsService.getUser(username);
+
+        if (!exercise.getWriter().equals(user)) {
+            throw new AccessDeniedException("이 운동 기록을 조회할 권한이 없습니다.");
+        }
+
+        return GetDetailsResDto.builder()
+                .id(exercise.getId())
+                .category(exercise.getCategory())
+                .createTime(LocalDate.from(exercise.getCreateTime()))
+                .startTime(LocalTime.from(exercise.getStartTime()))
+                .endTime(LocalTime.from(exercise.getEndTime()))
+                .description(exercise.getDescription())
+                .rating(exercise.getRating())
+                .build();
+
+    }
 }
