@@ -49,11 +49,10 @@ public class SecurityConfig {
                 .httpBasic((auth) -> auth.disable());
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/user/check-userid/**", "/user/signup", "/reissue", "/user/validateToken","/exercise/create").permitAll()//엔드포인트는 인증 없이 허용
+                        .requestMatchers("/user/check-userid/**", "/user/signup", "/reissue", "/user/validateToken", "/exercise/getByDate", "/exercise/create").permitAll()//엔드포인트는 인증 없이 허용
                         .requestMatchers("/user/profile").authenticated()
                         .anyRequest().authenticated() // 다른 모든 요청은 인증 필요
                 );
-
         http
                 .addFilterBefore(new JWTFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 

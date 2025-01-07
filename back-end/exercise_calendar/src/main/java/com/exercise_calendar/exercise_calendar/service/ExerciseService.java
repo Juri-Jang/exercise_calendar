@@ -2,6 +2,8 @@ package com.exercise_calendar.exercise_calendar.service;
 
 import com.exercise_calendar.exercise_calendar.dto.createReqDto;
 import com.exercise_calendar.exercise_calendar.dto.createResDto;
+import com.exercise_calendar.exercise_calendar.dto.exerciseByDateReqDto;
+import com.exercise_calendar.exercise_calendar.dto.exerciseByDateResDto;
 import com.exercise_calendar.exercise_calendar.entity.Exercise;
 import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.repository.ExerciseRepository;
@@ -10,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ExerciseService {
@@ -44,6 +50,26 @@ public class ExerciseService {
                 .endTime(exercise.getEndTime())
                 .description(exercise.getDescription())
                 .rating(exercise.getRating())
+                .build();
+    }
+
+    public exerciseByDateResDto getExerciseByDate(exerciseByDateReqDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = customUserDetailsService.getUser(username);
+
+        LocalDate date = dto.getDate();
+
+        List<Exercise> exercises = exerciseRepository.findByWriterAndDate(user, date);
+
+        // 결과 변환
+        return exerciseByDateResDto.builder()
+                .exercises(exercises.stream()
+                        .map(exercise -> exerciseByDateResDto.ExerciseDto.builder()
+                                .id(exercise.getId())
+                                .category(exercise.getCategory())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 
