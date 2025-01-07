@@ -2,6 +2,7 @@ package com.exercise_calendar.exercise_calendar.controller;
 
 import com.exercise_calendar.exercise_calendar.dto.*;
 import com.exercise_calendar.exercise_calendar.service.ExerciseService;
+import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,18 @@ public class ExerciseController {
     public ResponseEntity<?> getExerciseDetails(@PathVariable Long id) {
         try{
             GetDetailsResDto response = exerciseService.getExerciseDetails(id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러가 발생했습니다.");
+        }
+    }
+
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<?> updateExercise(@PathVariable long id, @RequestBody UpdateDto dto){
+        try{
+            UpdateDto response = exerciseService.update(dto);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

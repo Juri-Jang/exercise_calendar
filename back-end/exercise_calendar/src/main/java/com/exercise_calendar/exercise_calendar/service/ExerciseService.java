@@ -5,6 +5,7 @@ import com.exercise_calendar.exercise_calendar.entity.Exercise;
 import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.repository.ExerciseRepository;
 import com.exercise_calendar.exercise_calendar.repository.UserRepository;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,10 +14,7 @@ import org.springframework.stereotype.Service;
 import java.nio.file.AccessDeniedException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,14 +75,14 @@ public class ExerciseService {
 
     public GetDetailsResDto getExerciseDetails(long id) throws AccessDeniedException {
         Exercise exercise = exerciseRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("운동 정보가 없습니다."));
+                .orElseThrow(() -> new IllegalStateException("해당 운동 정보가 없습니다."));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         User user = customUserDetailsService.getUser(username);
 
         if (!exercise.getWriter().equals(user)) {
-            throw new AccessDeniedException("이 운동 기록을 조회할 권한이 없습니다.");
+            throw new AccessDeniedException("조회할 권한이 없습니다.");
         }
 
         return GetDetailsResDto.builder()
@@ -97,5 +95,44 @@ public class ExerciseService {
                 .rating(exercise.getRating())
                 .build();
 
+    }
+
+
+    public UpdateDto update(UpdateDto dto) throws AccessDeniedException{
+        Exercise exercise = exerciseRepository.findById(dto.getId())
+                .orElseThrow(() -> new IllegalStateException("해당 운동 정보가 없습니다."));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = customUserDetailsService.getUser(username);
+
+        if (!exercise.getWriter().equals(user)) {
+            throw new AccessDeniedException("조회할 권한이 없습니다.");
+        }
+
+        if(dto.getCategory() != null){
+            exercise.setCategory(dto.getCategory());
+        }
+        if(dto.getStartTime() != null){
+            exercise.setStartTime(dto.getStartTime());
+        }
+        if(dto.getEndTime() != null){
+            exercise.setEndTime(dto.getEndTime());
+        }
+        if(dto.getDescription() != null){
+            exercise.setDescription(dto.getDescription());
+        }
+        if(dto.getRating() != null){
+            exercise.setRating(dto.getRating());
+        }
+        exerciseRepository.save(exercise);
+        return UpdateDto.builder()
+                .id(exercise.getId())
+                .category(exercise.getCategory())
+                .startTime(LocalTime.from(exercise.getStartTime()))
+                .endTime(LocalTime.from(exercise.getEndTime()))
+                .description(exercise.getDescription())
+                .rating(exercise.getRating())
+                .build();
     }
 }
