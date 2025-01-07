@@ -135,4 +135,18 @@ public class ExerciseService {
                 .rating(exercise.getRating())
                 .build();
     }
+
+    public void delete(long id) throws AccessDeniedException{
+        Exercise exercise = exerciseRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("해당 운동 정보가 없습니다."));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = customUserDetailsService.getUser(username);
+
+        if (!exercise.getWriter().equals(user)) {
+            throw new AccessDeniedException("조회할 권한이 없습니다.");
+        }
+        exerciseRepository.deleteById(id);
+    }
 }
