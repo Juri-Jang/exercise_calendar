@@ -1,7 +1,9 @@
 package com.exercise_calendar.exercise_calendar.jwt;
 
 import com.exercise_calendar.exercise_calendar.entity.Refresh;
+import com.exercise_calendar.exercise_calendar.entity.User;
 import com.exercise_calendar.exercise_calendar.repository.RefreshRepository;
+import com.exercise_calendar.exercise_calendar.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
@@ -25,11 +27,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final RefreshRepository refreshRepository;
+    private final UserRepository userRepository;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository) {
+    public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshRepository refreshRepository, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.refreshRepository = refreshRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -78,6 +82,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
+        Long userId = userRepository.findByUsername(username)
+                .map(User::getId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+
         //토큰 생성
         String access = jwtUtil.createJwt("access", username, role, 600000L); //10분
         String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L); //24시간
@@ -85,10 +94,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //Refresh 토큰 저장
         addRefreshEntity(username, refresh, 86400000L);
 
+
+        String jsonResponse = String.format("{\"message\":\"login success\", \"userId\":%d}", userId);
+
         //응답 설정
         response.setHeader("access", access); //응답 헤더에 설정
         response.addCookie(createCookie("refresh", refresh)); //응답 쿠키에 설정
-        response.getWriter().write("login success");
+        response.getWriter().write(jsonResponse);
         response.setStatus(HttpStatus.OK.value());
     }
 

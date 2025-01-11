@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface UserRepository  extends JpaRepository<User, Long> {
     //회원가입시 userid 중복 확인
     Optional<User> findByUsername(String username);
+    Optional<User> findById(Long id);
 }

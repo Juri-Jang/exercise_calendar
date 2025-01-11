@@ -57,6 +57,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             User user = customUserDetails.getUser();
 
             return UserProfileResDto.builder()
+                    .id(user.getId())
                     .username(user.getUsername())
                     .email(user.getEmail())
                     .name(user.getName())

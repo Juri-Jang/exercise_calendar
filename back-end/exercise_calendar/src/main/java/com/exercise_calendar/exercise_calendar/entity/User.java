@@ -5,8 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Getter
-@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,4 +28,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;  // 기본 역할 설정
+
+    public Long getId(String usernam) {
+
+        return getId();
+    }
 }
+

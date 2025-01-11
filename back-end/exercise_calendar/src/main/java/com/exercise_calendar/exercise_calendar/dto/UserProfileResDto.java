@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class UserProfileResDto {
+    private Long id;
     private String username;
     private String email;
     private String name;
