@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 
 class CreateReqDto {
-  // final User user;
   final String category;
-  final TimeOfDay createTime;
-  final TimeOfDay startTime;
-  final TimeOfDay endTime;
+  final String date;
+  final String startTime;
+  final String endTime;
   final String description;
   final int rating;
 
-  CreateReqDto(this.category, this.createTime, this.startTime, this.endTime,
-      this.description, this.rating);
+  CreateReqDto({
+    required this.category,
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+    required this.description,
+    required this.rating,
+  });
 
   Map<String, dynamic> toJson() => {
         "category": category,
-        "createTime": createTime,
+        "date": date,
         "startTime": startTime,
         "endTime": endTime,
         "description": description,

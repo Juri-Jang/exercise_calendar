@@ -22,7 +22,7 @@ class ExerciseRegister extends StatelessWidget {
       c.selectedExercise.value = exercise!['종목'];
       c.startTime.value = exercise!['시작시간'];
       c.endTime.value = (exercise!['종료시간']);
-      c.feedbackController.text = exercise!['운동기록'];
+      c.description.text = exercise!['운동기록'];
       c.rating.value = exercise!['평점'];
     }
 
@@ -148,7 +148,7 @@ class ExerciseRegister extends StatelessWidget {
               Text('운동 기록'),
               SizedBox(height: 10),
               TextField(
-                controller: c.feedbackController,
+                controller: c.description,
                 maxLines: 3,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
@@ -203,7 +203,7 @@ class ExerciseRegister extends StatelessWidget {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    c.registerExercise(selectDay, num);
+                    c.registerExercise(context, selectDay, num);
                   },
                   child: num != 1
                       ? Text('등록', style: TextStyle(color: Colors.white))

@@ -1,12 +1,18 @@
+import 'package:exercise_calendar/domain/exercise/exercise_repository.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
+import 'package:exercise_calendar/view/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ExerciseController extends GetxController {
+  ExerciseRepository _exerciseRepository = new ExerciseRepository();
+  UserController _userController = Get.find<UserController>();
+
+  var userid = 0.obs;
   var selectedExercise = '배드민턴'.obs;
   var startTime = TimeOfDay.now().obs;
   var endTime = TimeOfDay.now().obs;
-  TextEditingController feedbackController = TextEditingController();
+  TextEditingController description = TextEditingController();
   var rating = 1.obs;
   var exerciseList = <Map<String, dynamic>>[].obs;
   var file = ''.obs; // 첨부 파일
@@ -16,19 +22,31 @@ class ExerciseController extends GetxController {
 
   @override
   void onInit() {
+    userid.value = _userController.user_id.value;
+    print('user id : $userid');
     super.onInit();
   }
 
-  void registerExercise(DateTime dt, int num) {
+  void registerExercise(BuildContext context, DateTime dt, int num) {
     if (num == 0) {
       // 신규 등록
+      _exerciseRepository.create(
+          context,
+          // _userController.user_id.value,
+          dt,
+          selectedExercise.value,
+          startTime.value,
+          endTime.value,
+          description.text,
+          rating.value);
+
       exerciseList.add(
         {
           '날짜': dt,
           '종목': selectedExercise.value,
           '시작시간': startTime.value,
           '종료시간': endTime.value,
-          '운동기록': feedbackController.text,
+          '운동기록': description.text,
           '평점': rating.value
         },
       );
@@ -46,7 +64,7 @@ class ExerciseController extends GetxController {
           '종목': selectedExercise.value,
           '시작시간': startTime.value,
           '종료시간': endTime.value,
-          '운동기록': feedbackController.text,
+          '운동기록': description.text,
           '평점': rating.value
         };
       }
@@ -79,7 +97,7 @@ class ExerciseController extends GetxController {
     startTime = TimeOfDay.now().obs;
     endTime = TimeOfDay.now().obs;
     rating = 1.obs;
-    feedbackController.clear();
+    description.clear();
   }
 
   void onDaySelected(DateTime day) {

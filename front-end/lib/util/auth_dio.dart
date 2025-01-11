@@ -21,7 +21,6 @@ Future authDio(BuildContext context) async {
         'access': accessToken,
         'Content-Type': 'application/json',
       });
-      print('Request Headers: ${options.headers}'); // 헤더 로그 출력
       return handler.next(options); // 요청을 계속 진행
     },
 

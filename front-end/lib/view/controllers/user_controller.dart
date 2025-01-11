@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 
 class UserController extends GetxController {
   final UserRepository _userRepository = UserRepository();
-
+  var user_id = 0.obs;
   var name = "Guest".obs;
   var email = "guest@example.com".obs;
   final _storage = FlutterSecureStorage();
@@ -18,7 +18,6 @@ class UserController extends GetxController {
       loadUserInfo(); // 앱 시작 시 사용자 정보 로드
     });
     printSecureStorage();
-    print('로드~~~~');
   }
 
   void printSecureStorage() async {
@@ -49,8 +48,8 @@ class UserController extends GetxController {
       final userInfo = await _userRepository.getUserInfo(Get.context!);
       name.value = userInfo['name'] ?? 'Guest'; // null 값 처리
       email.value = userInfo['email'] ?? 'guest@example.com'; // null 값 처리
-      print('name : ${name.value}');
-      print('email : ${email.value}');
+      user_id.value = userInfo['id'] ?? 0;
+      print("userid : $user_id");
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
     }

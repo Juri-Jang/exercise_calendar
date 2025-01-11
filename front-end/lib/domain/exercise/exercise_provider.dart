@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:exercise_calendar/util/auth_dio.dart';
 import 'package:flutter/material.dart';
 
-class UserProvider {
+class ExerciseProvider {
   final Dio _dio = Dio();
 
   Future<Response> create(
