@@ -5,6 +5,7 @@ import com.exercise_calendar.exercise_calendar.jwt.JWTFilter;
 import com.exercise_calendar.exercise_calendar.jwt.JWTUtil;
 import com.exercise_calendar.exercise_calendar.jwt.LoginFilter;
 import com.exercise_calendar.exercise_calendar.repository.RefreshRepository;
+import com.exercise_calendar.exercise_calendar.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -39,7 +40,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, UserRepository userRepository) throws Exception {
 
         http
                 .csrf((auth) -> auth.disable());
@@ -59,7 +60,7 @@ public class SecurityConfig {
 
 
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, userRepository), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
