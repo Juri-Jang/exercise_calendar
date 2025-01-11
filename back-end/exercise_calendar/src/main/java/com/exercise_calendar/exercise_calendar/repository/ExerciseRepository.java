@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
-    @Query("SELECT e FROM Exercise e WHERE e.writer = :user AND DATE(e.createTime) = :date")
+    @Query("SELECT e FROM Exercise e WHERE e.writer = :user AND DATE(e.date) = :date")
     List<Exercise> findByWriterAndDate(@Param("user") User user, @Param("date") LocalDate date);
 
     @Query("SELECT e FROM Exercise e WHERE e.writer = :user")

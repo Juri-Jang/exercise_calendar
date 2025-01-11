@@ -22,8 +22,6 @@ public class ExerciseService {
     @Autowired
     private ExerciseRepository exerciseRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private CustomUserDetailsService  customUserDetailsService;
 
 
@@ -41,15 +39,18 @@ public class ExerciseService {
         exercise.setEndTime(dto.getEndTime());
         exercise.setDescription(dto.getDescription());
         exercise.setRating(dto.getRating());
+        exercise.setDate(dto.getDate());
 
         exerciseRepository.save(exercise);
 
         return CreateResDto.builder()
+                .id(exercise.getId())
                 .category(exercise.getCategory())
                 .startTime(exercise.getStartTime())
                 .endTime(exercise.getEndTime())
                 .description(exercise.getDescription())
                 .rating(exercise.getRating())
+                .date(exercise.getDate())
                 .build();
     }
 
@@ -64,12 +65,12 @@ public class ExerciseService {
         List<Exercise> exercises = exerciseRepository.findByUser(user);
 
         // 기본값을 최신 날짜순으로 설정하고, sortBy가 없으면 latest로 처리
-        Comparator<Exercise> comparator = Comparator.comparing(Exercise::getCreateTime).reversed(); // 기본값: 최신 날짜순
+        Comparator<Exercise> comparator = Comparator.comparing(Exercise::getDate).reversed(); // 기본값: 최신 날짜순
 
         if ("highestRating".equals(sortBy)) {
             comparator = Comparator.comparingInt(Exercise::getRating).reversed(); // 평점 높은 순
         } else if ("oldest".equals(sortBy)) {
-            comparator = Comparator.comparing(Exercise::getCreateTime, Comparator.nullsFirst(Comparator.naturalOrder())); // 오래된 날짜 순
+            comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.naturalOrder())); // 오래된 날짜 순
         }
 
         List<Exercise> sortedExercises = exercises.stream()
@@ -81,7 +82,7 @@ public class ExerciseService {
                         .map(exercise -> GetAllResDto.ExerciseDto.builder()
                                 .id(exercise.getId())
                                 .category(exercise.getCategory())
-                                .createTime(LocalDate.from(exercise.getCreateTime()))
+                                .createTime(exercise.getDate())
                                 .rating(exercise.getRating())
                                 .build())
                         .collect(Collectors.toList()))
@@ -126,7 +127,7 @@ public class ExerciseService {
         return GetDetailsResDto.builder()
                 .id(exercise.getId())
                 .category(exercise.getCategory())
-                .createTime(LocalDate.from(exercise.getCreateTime()))
+                .createTime(LocalDate.from(exercise.getDate()))
                 .startTime(LocalTime.from(exercise.getStartTime()))
                 .endTime(LocalTime.from(exercise.getEndTime()))
                 .description(exercise.getDescription())

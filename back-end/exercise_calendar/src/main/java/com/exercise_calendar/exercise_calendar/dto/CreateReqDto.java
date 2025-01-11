@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Getter
@@ -11,11 +13,11 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateReqDto {
-    private Long writerId;
     private String category;
     private LocalTime startTime;
     private LocalTime endTime;
     private String description;
     private int rating;
+    private LocalDate date;
 
 }
