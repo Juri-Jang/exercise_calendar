@@ -203,7 +203,7 @@ class ExerciseRegister extends StatelessWidget {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    c.registerExercise(context, selectDay, num);
+                    c.createExercise(context, selectDay, num);
                   },
                   child: num != 1
                       ? Text('등록', style: TextStyle(color: Colors.white))

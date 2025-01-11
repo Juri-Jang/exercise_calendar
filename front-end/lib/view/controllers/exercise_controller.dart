@@ -23,22 +23,14 @@ class ExerciseController extends GetxController {
   @override
   void onInit() {
     userid.value = _userController.user_id.value;
-    print('user id : $userid');
     super.onInit();
   }
 
-  void registerExercise(BuildContext context, DateTime dt, int num) {
+  void createExercise(BuildContext context, DateTime dt, int num) {
     if (num == 0) {
       // 신규 등록
-      _exerciseRepository.create(
-          context,
-          // _userController.user_id.value,
-          dt,
-          selectedExercise.value,
-          startTime.value,
-          endTime.value,
-          description.text,
-          rating.value);
+      _exerciseRepository.create(context, dt, selectedExercise.value,
+          startTime.value, endTime.value, description.text, rating.value);
 
       exerciseList.add(
         {
