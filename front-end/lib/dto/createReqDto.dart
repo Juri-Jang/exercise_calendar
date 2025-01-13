@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class CreateReqDto {
   final String category;
   final String date;

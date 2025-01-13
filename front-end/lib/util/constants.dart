@@ -1,4 +1,4 @@
-const String BASE_URL = "http://192.168.219.100:8080"; // 집 IP 주소
+const String BASE_URL = "http://192.168.219.101:8080"; // 집 IP 주소
 
 const ACESS_TOKEN_KEY = 'ACCESS_TOKEN';
 const REFRESH_TOKEN_KEY = 'REFRESH_TOKEN';

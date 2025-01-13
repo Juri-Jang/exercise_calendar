@@ -23,6 +23,10 @@ class ExerciseController extends GetxController {
   @override
   void onInit() {
     userid.value = _userController.user_id.value;
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   getByDate(Get.context!, DateTime.now()); // 앱 시작 시 사용자 정보 로드
+    // });
+    getAll(Get.context!, "latest", "jang");
     super.onInit();
   }
 
@@ -66,6 +70,40 @@ class ExerciseController extends GetxController {
         MainScreen()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
     print('운동 등록 성공');
     printExercise();
+  }
+
+  void getByDate(BuildContext context, DateTime date) async {
+    try {
+      final response = await _exerciseRepository.getByDate(context, date);
+      if (response.isNotEmpty) {
+        exerciseList.addAll(response);
+      }
+      print('exercise : ${exerciseList.value}');
+    } catch (e) {
+      print('날짜별 운동 불러오기 실패 $e');
+    }
+  }
+
+  void getAll(BuildContext context, String sortBy, String username) async {
+    try {
+      final response =
+          await _exerciseRepository.getAll(context, sortBy, username);
+
+      if (response.isNotEmpty) {
+        var exercises = response[0]['exercises'];
+
+        // exercise의 'date'가 null이 아닌 값만 DateTime으로 변환하여 exerciseDays에 추가
+        exerciseDays = exercises
+            .where((exercise) => exercise['date'] != null)
+            .map((exercise) => DateTime.parse(exercise['date']))
+            .toList();
+
+        print('exerciseDays: $exerciseDays');
+        print('exercises: $exercises');
+      }
+    } catch (e) {
+      print('전체 날짜 불러오기 실패: $e');
+    }
   }
 
   void deleteExercise(int idx) {
