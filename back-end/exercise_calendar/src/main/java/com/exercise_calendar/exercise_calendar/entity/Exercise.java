@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -35,9 +36,12 @@ public class Exercise {
     @Column(nullable = false)
     private int rating;
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createTime;
+    @Column(nullable = false)
+    private LocalDate date;
+
+//    @CreationTimestamp
+//    @Column(nullable = false, updatable = false)
+//    private LocalDateTime createTime;
 
 
     public Exercise(User writer, String category, LocalTime startTime, LocalTime endTime, String description, int rating) {

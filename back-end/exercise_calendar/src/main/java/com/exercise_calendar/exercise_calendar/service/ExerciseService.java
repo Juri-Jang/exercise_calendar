@@ -60,21 +60,27 @@ public class ExerciseService {
     2. 평점 높은순(highestRating)
     3. 오래된 날짜순(oldest)
     */
-    public GetAllResDto getAllExercises(String username, String sortBy){
+    public GetAllResDto getAllExercises(String username, String sortBy) {
         User user = customUserDetailsService.getUser(username);
         List<Exercise> exercises = exerciseRepository.findByUser(user);
 
-        // 기본값을 최신 날짜순으로 설정하고, sortBy가 없으면 latest로 처리
-        Comparator<Exercise> comparator = Comparator.comparing(Exercise::getDate).reversed(); // 기본값: 최신 날짜순
+        // 정렬 조건 설정
+        Comparator<Exercise> comparator;
 
         if ("highestRating".equals(sortBy)) {
             comparator = Comparator.comparingInt(Exercise::getRating).reversed(); // 평점 높은 순
         } else if ("oldest".equals(sortBy)) {
             comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.naturalOrder())); // 오래된 날짜 순
+        } else if ("latest".equals(sortBy)) {
+            comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.naturalOrder())); // 최신 날짜 순
+        } else {
+            // `sortBy`가 `null` 또는 예상하지 못한 값인 경우 기본 동작 설정
+            throw new IllegalArgumentException("유효하지 않은 정렬 기준입니다: " + sortBy);
         }
 
+        // 정렬 적용
         List<Exercise> sortedExercises = exercises.stream()
-                .sorted(comparator) // 선택된 comparator로 정렬
+                .sorted(comparator)
                 .collect(Collectors.toList());
 
         return GetAllResDto.builder()
@@ -82,13 +88,13 @@ public class ExerciseService {
                         .map(exercise -> GetAllResDto.ExerciseDto.builder()
                                 .id(exercise.getId())
                                 .category(exercise.getCategory())
-                                .createTime(exercise.getDate())
+                                .date(exercise.getDate())
                                 .rating(exercise.getRating())
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
-
     }
+
 
     //날짜별 운동 조회
     public GetByDateResDto getExerciseByDate(GetByDateReqDto dto) {

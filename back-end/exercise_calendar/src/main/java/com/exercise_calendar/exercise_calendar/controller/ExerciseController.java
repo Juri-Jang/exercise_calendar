@@ -30,7 +30,7 @@ public class ExerciseController {
 
     //운동 전체 조회
     @GetMapping("/getAll/{username}")
-    public ResponseEntity<?> getAllExercises(@PathVariable String username, @RequestParam(required = false) String sortBy) {
+    public ResponseEntity<?> getAllExercises(@PathVariable String username, @RequestParam String sortBy) {
         try {
             GetAllResDto response = exerciseService.getAllExercises(username, sortBy);
             return ResponseEntity.status(HttpStatus.OK).body(response);

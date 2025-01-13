@@ -17,7 +17,7 @@ public class GetAllResDto {
     public static class ExerciseDto {
         private long id;
         private String category;
-        private LocalDate createTime;
+        private LocalDate date;
         private Integer rating;
     }
 }
