@@ -60,7 +60,7 @@ public class ExerciseService {
     2. 평점 높은순(highestRating)
     3. 오래된 날짜순(oldest)
     */
-    public GetAllResDto getAllExercises(String username, String sortBy) {
+    public List<GetAllResDto.ExerciseDto> getAllExercises(String username, String sortBy) {
         User user = customUserDetailsService.getUser(username);
         List<Exercise> exercises = exerciseRepository.findByUser(user);
 
@@ -83,17 +83,17 @@ public class ExerciseService {
                 .sorted(comparator)
                 .collect(Collectors.toList());
 
-        return GetAllResDto.builder()
-                .exercises(sortedExercises.stream()
-                        .map(exercise -> GetAllResDto.ExerciseDto.builder()
-                                .id(exercise.getId())
-                                .category(exercise.getCategory())
-                                .date(exercise.getDate())
-                                .rating(exercise.getRating())
-                                .build())
-                        .collect(Collectors.toList()))
-                .build();
+        // ExerciseDto 리스트 반환
+        return sortedExercises.stream()
+                .map(exercise -> GetAllResDto.ExerciseDto.builder()
+                        .id(exercise.getId())
+                        .category(exercise.getCategory())
+                        .date(exercise.getDate())
+                        .rating(exercise.getRating())
+                        .build())
+                .collect(Collectors.toList());
     }
+
 
 
     //날짜별 운동 조회
