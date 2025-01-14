@@ -95,13 +95,13 @@ class ExerciseCalender extends StatelessWidget {
                 () {
                   var selectedDayExercises = c.exerciseList
                       .where((exercise) =>
-                          isSameDay(exercise['날짜'], c.selectedDay.value))
+                          isSameDay(exercise['date'], c.selectedDay.value))
                       .toList();
                   return ListView.builder(
                     itemCount: selectedDayExercises.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(selectedDayExercises[index]['종목']),
+                        title: Text(selectedDayExercises[index]['category']),
                         trailing: IconButton(
                             onPressed: () {
                               // 삭제 로직

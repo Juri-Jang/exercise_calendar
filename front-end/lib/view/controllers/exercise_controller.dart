@@ -8,34 +8,68 @@ class ExerciseController extends GetxController {
   ExerciseRepository _exerciseRepository = new ExerciseRepository();
   UserController _userController = Get.find<UserController>();
 
+  var selectedDay = DateTime.now().obs;
+  var exerciseDays = <DateTime>[].obs; // 운동이 있는 날짜 리스트
+
   var userid = 0.obs;
+  var username = "".obs;
   var selectedExercise = '배드민턴'.obs;
   var startTime = TimeOfDay.now().obs;
   var endTime = TimeOfDay.now().obs;
   TextEditingController description = TextEditingController();
   var rating = 1.obs;
-  var exerciseList = <Map<String, dynamic>>[].obs;
+  var exerciseList = <dynamic>[].obs;
   var file = ''.obs; // 첨부 파일
-
-  var selectedDay = DateTime.now().obs;
-  var exerciseDays = <DateTime>[].obs;
 
   @override
   void onInit() {
     userid.value = _userController.user_id.value;
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   getByDate(Get.context!, DateTime.now()); // 앱 시작 시 사용자 정보 로드
-    // });
-    getAll(Get.context!, "latest", "jang");
+    username.value = _userController.username.value;
+
+    _loadAllExercises(username.value);
     super.onInit();
+  }
+
+  Future<void> _loadAllExercises(String username) async {
+    try {
+      final response =
+          await _exerciseRepository.getAll(Get.context!, "latest", username);
+
+      // 각 항목의 'date'를 DateTime으로 변환 후 바로 exerciseList에 추가
+      final updatedExercises = response.map((e) {
+        final dateString = e['date']; // 날짜 문자열 추출
+        if (dateString == null) {
+          throw Exception('Missing date field in exercise: $e');
+        }
+        final date = DateTime.parse(dateString); // 문자열을 DateTime으로 변환
+        return {
+          ...e,
+          'date': date, // 변환된 DateTime을 'date'로 덮어씀
+        };
+      }).toList();
+
+      // 변환된 데이터를 exerciseList에 추가
+      exerciseList.addAll(updatedExercises);
+
+      final newExerciseDays = updatedExercises.map((e) {
+        return e['date'] as DateTime;
+        ; // 각 항목에서 'date'만 추출
+      }).toList(); // 중복 검사 없이 날짜 추가
+
+      exerciseDays.addAll(newExerciseDays);
+    } catch (e) {
+      print('모든 운동 데이터 로드 실패: $e');
+    }
   }
 
   void createExercise(BuildContext context, DateTime dt, int num) {
     if (num == 0) {
       // 신규 등록
+      //DB에 저장
       _exerciseRepository.create(context, dt, selectedExercise.value,
           startTime.value, endTime.value, description.text, rating.value);
 
+      //캐시 역할
       exerciseList.add(
         {
           '날짜': dt,
@@ -81,28 +115,6 @@ class ExerciseController extends GetxController {
       print('exercise : ${exerciseList.value}');
     } catch (e) {
       print('날짜별 운동 불러오기 실패 $e');
-    }
-  }
-
-  void getAll(BuildContext context, String sortBy, String username) async {
-    try {
-      final response =
-          await _exerciseRepository.getAll(context, sortBy, username);
-
-      if (response.isNotEmpty) {
-        var exercises = response[0]['exercises'];
-
-        // exercise의 'date'가 null이 아닌 값만 DateTime으로 변환하여 exerciseDays에 추가
-        exerciseDays = exercises
-            .where((exercise) => exercise['date'] != null)
-            .map((exercise) => DateTime.parse(exercise['date']))
-            .toList();
-
-        print('exerciseDays: $exerciseDays');
-        print('exercises: $exercises');
-      }
-    } catch (e) {
-      print('전체 날짜 불러오기 실패: $e');
     }
   }
 

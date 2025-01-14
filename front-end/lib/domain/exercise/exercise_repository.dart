@@ -57,12 +57,12 @@ class ExerciseRepository {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getAll(
+  Future<List<dynamic>> getAll(
       BuildContext context, String sortBy, String username) async {
     try {
       final response =
           await _exerciseProvider.getAll(context, sortBy, username);
-      return [response.data];
+      return response.data;
     } catch (e) {
       ('전체 운동 조회 실패 $e');
       rethrow;

@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:exercise_calendar/util/auth_dio.dart';
-import 'package:exercise_calendar/util/jwt.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseProvider {
