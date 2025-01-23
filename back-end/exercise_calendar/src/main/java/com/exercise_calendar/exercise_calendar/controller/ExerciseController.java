@@ -2,7 +2,6 @@ package com.exercise_calendar.exercise_calendar.controller;
 
 import com.exercise_calendar.exercise_calendar.dto.*;
 import com.exercise_calendar.exercise_calendar.service.ExerciseService;
-import org.hibernate.sql.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +29,10 @@ public class ExerciseController {
     }
 
     //운동 전체 조회
-    @GetMapping("/getAll/{userid}")
-    public ResponseEntity<?> getAllExercises(@PathVariable Long userid, @RequestParam String sortBy) {
+    @GetMapping("/getAll/{username}")
+    public ResponseEntity<?> getAllExercises(@PathVariable String username, @RequestParam String sortBy) {
         try {
-            List<GetAllResDto.ExerciseDto> response = (List<GetAllResDto.ExerciseDto>) exerciseService.getAllExercises(userid, sortBy);
+            List<GetAllResDto.ExerciseDto> response = (List<GetAllResDto.ExerciseDto>) exerciseService.getAllExercises(username, sortBy);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
