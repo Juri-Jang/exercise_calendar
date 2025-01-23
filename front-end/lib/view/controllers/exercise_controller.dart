@@ -10,6 +10,7 @@ class ExerciseController extends GetxController {
 
   var selectedDay = DateTime.now().obs;
   var exerciseDays = <DateTime>[].obs; // 운동이 있는 날짜 리스트
+  var exerciseList = <dynamic>[].obs;
 
   var userid = 0.obs;
   var username = "".obs;
@@ -18,7 +19,7 @@ class ExerciseController extends GetxController {
   var endTime = TimeOfDay.now().obs;
   TextEditingController description = TextEditingController();
   var rating = 1.obs;
-  var exerciseList = <dynamic>[].obs;
+
   var file = ''.obs; // 첨부 파일
 
   @override
@@ -26,7 +27,10 @@ class ExerciseController extends GetxController {
     userid.value = _userController.user_id.value;
     username.value = _userController.username.value;
 
-    _loadAllExercises(username.value);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadAllExercises(username.value);
+      print('exercise $exerciseDays');
+    });
     super.onInit();
   }
 
@@ -50,10 +54,10 @@ class ExerciseController extends GetxController {
 
       // 변환된 데이터를 exerciseList에 추가
       exerciseList.addAll(updatedExercises);
+      print('exerciseList $exerciseList');
 
       final newExerciseDays = updatedExercises.map((e) {
-        return e['date'] as DateTime;
-        ; // 각 항목에서 'date'만 추출
+        return e['date'] as DateTime; // 각 항목에서 'date'만 추출
       }).toList(); // 중복 검사 없이 날짜 추가
 
       exerciseDays.addAll(newExerciseDays);
@@ -62,43 +66,63 @@ class ExerciseController extends GetxController {
     }
   }
 
-  void createExercise(BuildContext context, DateTime dt, int num) {
-    if (num == 0) {
-      // 신규 등록
-      //DB에 저장
-      _exerciseRepository.create(context, dt, selectedExercise.value,
-          startTime.value, endTime.value, description.text, rating.value);
+  void createExercise(BuildContext context, DateTime dt, int num) async {
+    // 신규 등록
 
-      //캐시 역할
-      exerciseList.add(
-        {
-          '날짜': dt,
-          '종목': selectedExercise.value,
-          '시작시간': startTime.value,
-          '종료시간': endTime.value,
-          '운동기록': description.text,
-          '평점': rating.value
-        },
-      );
+    try {
+      //DB에 저장
+      final response = await _exerciseRepository.create(
+          context,
+          dt,
+          selectedExercise.value,
+          startTime.value,
+          endTime.value,
+          description.text,
+          rating.value);
+
+      exerciseList.add({
+        'id': response.data['id'],
+        'date': dt,
+        'category': selectedExercise.value,
+        'startTime': startTime.value,
+        'endTime': endTime.value,
+        'description': description.text,
+        'rating': rating.value
+      });
+
       if (!exerciseDays.contains(dt)) {
         exerciseDays.add(dt); // 운동 등록 시 날짜 추가
         print('days: $exerciseDays');
       }
-    } else if (num == 1) {
-      // 기존 내용 수정
-      int index = exerciseList.indexWhere((exercise) =>
-          exercise['날짜'] == dt && exercise['종목'] == selectedExercise.value);
-      if (index != -1) {
-        exerciseList[index] = {
-          '날짜': dt,
-          '종목': selectedExercise.value,
-          '시작시간': startTime.value,
-          '종료시간': endTime.value,
-          '운동기록': description.text,
-          '평점': rating.value
-        };
-      }
+      clear();
+      Get.off(
+          MainScreen()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
+      print('운동 등록 성공');
+      printExercise();
+    } catch (e) {
+      print('운동 등록 실패: $e');
     }
+  }
+
+  void updateExercise(BuildContext context, DateTime dt, int id) {
+    // 기존 내용 수정
+    _exerciseRepository.update(context, id, dt, selectedExercise.value,
+        startTime.value, endTime.value, description.text, rating.value);
+    print('exercsiesefsd : $exerciseList');
+
+    final index = exerciseList.indexWhere((exercise) => exercise['id'] == id);
+
+    if (index != -1) {
+      exerciseList[index] = {
+        'date': dt,
+        'category': selectedExercise.value,
+        'startTime': startTime.value,
+        'endTime': endTime.value,
+        'description': description.text,
+        'rating': rating.value
+      };
+    }
+
     clear();
     Get.off(
         MainScreen()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
@@ -112,7 +136,7 @@ class ExerciseController extends GetxController {
       if (response.isNotEmpty) {
         exerciseList.addAll(response);
       }
-      print('exercise : ${exerciseList.value}');
+      print('exercise : ${exerciseList}');
     } catch (e) {
       print('날짜별 운동 불러오기 실패 $e');
     }

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:exercise_calendar/domain/exercise/exercise_provider.dart';
 import 'package:exercise_calendar/dto/CreateReqDto.dart';
+import 'package:exercise_calendar/dto/UpdateReqDto.dart';
 import 'package:flutter/material.dart';
 
 class ExerciseRepository {
@@ -16,7 +17,7 @@ class ExerciseRepository {
     return '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
-  Future<void> create(
+  Future<Response> create(
       BuildContext context,
       DateTime date,
       String category,
@@ -40,6 +41,40 @@ class ExerciseRepository {
       );
 
       Response response = await _exerciseProvider.create(context, dto.toJson());
+      print('response $response');
+      return response;
+    } catch (e) {
+      throw Exception('운동 등록 실패: $e');
+    }
+  }
+
+  Future<void> update(
+      BuildContext context,
+      int id,
+      DateTime date,
+      String category,
+      TimeOfDay startTime,
+      TimeOfDay endTime,
+      String description,
+      int rating) async {
+    try {
+      String formattedDate = formatDate(date);
+      String formattedStartTime = formatTimeOfDay(startTime);
+      String formattedEndTime = formatTimeOfDay(endTime);
+
+      // CreateReqDto 생성
+      UpdateReqDto dto = UpdateReqDto(
+        id: id,
+        category: category,
+        date: formattedDate,
+        startTime: formattedStartTime,
+        endTime: formattedEndTime,
+        description: description,
+        rating: rating,
+      );
+
+      Response response =
+          await _exerciseProvider.update(context, id, dto.toJson());
     } catch (e) {
       throw Exception('운동 등록 실패: $e');
     }

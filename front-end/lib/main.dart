@@ -1,5 +1,4 @@
 import 'package:exercise_calendar/view/controllers/user_controller.dart';
-import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
 import 'package:exercise_calendar/view/pages/user/login.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  UserRepository _userRepository = UserRepository();
   UserController _uc = UserController();
   MyApp({super.key});
 

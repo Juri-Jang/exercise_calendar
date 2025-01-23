@@ -22,7 +22,7 @@ class ExerciseCalender extends StatelessWidget {
         ),
         onPressed: () {
           if (c.selectedDay.value != null) {
-            Get.to(() => ExerciseRegister(c.selectedDay.value, 0));
+            Get.to(() => ExerciseCreate(c.selectedDay.value, 0));
           } else {
             // selectedDay가 null인 경우의 처리
             print("Selected day is null");
@@ -62,7 +62,6 @@ class ExerciseCalender extends StatelessWidget {
               calendarBuilders: CalendarBuilders(
                 markerBuilder: (context, day, focusedDay) {
                   if (c.exerciseDays.any((d) => isSameDay(d, day))) {
-                    print('tedtsest:${c.exerciseDays}');
                     return Positioned(
                       child: Image.asset(
                         'assets/아령.png',
@@ -97,6 +96,7 @@ class ExerciseCalender extends StatelessWidget {
                       .where((exercise) =>
                           isSameDay(exercise['date'], c.selectedDay.value))
                       .toList();
+                  print('selectedDayExercises : $selectedDayExercises');
                   return ListView.builder(
                     itemCount: selectedDayExercises.length,
                     itemBuilder: (context, index) {
@@ -110,7 +110,7 @@ class ExerciseCalender extends StatelessWidget {
                             },
                             icon: Icon(Icons.delete)),
                         onTap: () {
-                          Get.to(() => ExerciseRegister(c.selectedDay.value, 1,
+                          Get.to(() => ExerciseCreate(c.selectedDay.value, 1,
                               exercise: selectedDayExercises[index]));
                         },
                       );

@@ -17,6 +17,18 @@ class ExerciseProvider {
     }
   }
 
+  Future<Response> update(
+      BuildContext context, int id, Map<String, dynamic> data) async {
+    try {
+      final Dio _dio = await authDio(context);
+      final response = await _dio.patch("/exercise/update/$id", data: data);
+      return response;
+    } catch (e) {
+      print('수정 실패: $e');
+      rethrow;
+    }
+  }
+
   Future<Response> getByDate(BuildContext context, String date) async {
     try {
       final Dio _dio = await authDio(context);

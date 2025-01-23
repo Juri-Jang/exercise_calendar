@@ -50,9 +50,9 @@ class ExerciseHistory extends StatelessWidget {
               child: ListView.builder(
                 itemCount: c.exerciseList.length,
                 itemBuilder: ((context, index) {
-                  String exerciseType = c.exerciseList[index]['종목'];
-                  DateTime exerciseDate = c.exerciseList[index]['날짜'];
-                  int exerciseRating = c.exerciseList[index]['평점'];
+                  String exerciseType = c.exerciseList[index]['category'];
+                  DateTime exerciseDate = c.exerciseList[index]['date'];
+                  int exerciseRating = c.exerciseList[index]['rating'];
                   Widget leadingIcon;
                   switch (exerciseType) {
                     case '배드민턴':

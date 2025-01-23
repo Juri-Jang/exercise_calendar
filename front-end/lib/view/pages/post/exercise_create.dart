@@ -6,24 +6,43 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:time_picker_spinner_pop_up/time_picker_spinner_pop_up.dart';
 
-class ExerciseRegister extends StatelessWidget {
+class ExerciseCreate extends StatelessWidget {
   final ExerciseController c = Get.put(ExerciseController());
   final DateTime selectDay;
   final int num; // 0:신규등록, 1:수정
-  final Map<String, dynamic>? exercise;
+  final Map<dynamic, dynamic>? exercise;
 
-  ExerciseRegister(this.selectDay, this.num, {this.exercise});
+  ExerciseCreate(this.selectDay, this.num, {this.exercise});
 
   @override
   Widget build(BuildContext context) {
     if (num == 1) {
-      print('data$exercise');
+      print('exercise $exercise');
       // 수정 모드일 때 기존 데이터를 컨트롤러에 설정
-      c.selectedExercise.value = exercise!['종목'];
-      c.startTime.value = exercise!['시작시간'];
-      c.endTime.value = (exercise!['종료시간']);
-      c.description.text = exercise!['운동기록'];
-      c.rating.value = exercise!['평점'];
+
+      c.selectedExercise.value = exercise!['category'];
+
+      final startTime = exercise!['startTime'];
+      final endTime = exercise!['endTime'];
+
+      if (startTime is String) {
+        final startDateTime = DateFormat("HH:mm").parse(startTime);
+        c.startTime.value =
+            TimeOfDay(hour: startDateTime.hour, minute: startDateTime.minute);
+      } else if (startTime is TimeOfDay) {
+        c.startTime.value = startTime;
+      }
+
+      if (endTime is String) {
+        final endDateTime = DateFormat("HH:mm").parse(endTime);
+        c.endTime.value =
+            TimeOfDay(hour: endDateTime.hour, minute: endDateTime.minute);
+      } else if (endTime is TimeOfDay) {
+        c.endTime.value = endTime;
+      }
+
+      c.description.text = exercise!['description'];
+      c.rating.value = exercise!['rating'];
     }
 
     return Scaffold(
@@ -203,7 +222,11 @@ class ExerciseRegister extends StatelessWidget {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    c.createExercise(context, selectDay, num);
+                    if (num == 0) {
+                      c.createExercise(context, selectDay, num);
+                    } else if (num == 1) {
+                      c.updateExercise(context, selectDay, exercise?['id']);
+                    }
                   },
                   child: num != 1
                       ? Text('등록', style: TextStyle(color: Colors.white))
