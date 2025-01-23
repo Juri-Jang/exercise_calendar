@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -14,9 +15,12 @@ public class GetAllResDto {
     @Data
     @Builder
     public static class ExerciseDto {
-        private long id;
+        private Long id;
         private String category;
+        private LocalTime startTime;
+        private LocalTime endTime;
+        private String description;
+        private int rating;
         private LocalDate date;
-        private Integer rating;
     }
 }
