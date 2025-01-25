@@ -18,12 +18,6 @@ class UserController extends GetxController {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserInfo(); // 앱 시작 시 사용자 정보 로드
     });
-    printSecureStorage();
-  }
-
-  void printSecureStorage() async {
-    Map<String, String> allValues = await _storage.readAll();
-    print(allValues); // 데이터를 확인하기 위해 추가
   }
 
   // 로그인 상태 확인 및 사용자 정보 로딩
@@ -51,7 +45,6 @@ class UserController extends GetxController {
       email.value = userInfo['email'] ?? 'guest@example.com'; // null 값 처리
       user_id.value = userInfo['id'] ?? 0;
       username.value = userInfo['username'] ?? "";
-      print("userid : $user_id");
     } catch (e) {
       print('사용자 정보 로딩 실패: $e');
     }

@@ -61,16 +61,19 @@ class ExerciseCalender extends StatelessWidget {
               ),
               calendarBuilders: CalendarBuilders(
                 markerBuilder: (context, day, focusedDay) {
-                  if (c.exerciseDays.any((d) => isSameDay(d, day))) {
-                    return Positioned(
-                      child: Image.asset(
-                        'assets/아령.png',
-                        width: 20,
-                        height: 20,
-                      ),
-                    );
-                  }
-                  return null;
+                  return Obx(() {
+                    // 상태 변화를 감지하여 마커를 동적으로 렌더링
+                    if (c.exerciseDays.any((d) => isSameDay(d, day))) {
+                      return Positioned(
+                        child: Image.asset(
+                          'assets/아령.png',
+                          width: 20,
+                          height: 20,
+                        ),
+                      );
+                    }
+                    return SizedBox.shrink(); // 빈 위젯 반환
+                  });
                 },
               ),
             ),
