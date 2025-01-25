@@ -29,6 +29,17 @@ class ExerciseProvider {
     }
   }
 
+  Future<Response> delete(BuildContext context, int id) async {
+    try {
+      final Dio _dio = await authDio(context);
+      final response = await _dio.delete("/exercise/delete/$id");
+      return response;
+    } catch (e) {
+      print('삭제 실패: $e');
+      rethrow;
+    }
+  }
+
   Future<Response> getByDate(BuildContext context, String date) async {
     try {
       final Dio _dio = await authDio(context);

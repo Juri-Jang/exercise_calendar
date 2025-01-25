@@ -54,7 +54,6 @@ class ExerciseController extends GetxController {
 
       // 변환된 데이터를 exerciseList에 추가
       exerciseList.addAll(updatedExercises);
-      print('exerciseList $exerciseList');
 
       final newExerciseDays = updatedExercises.map((e) {
         return e['date'] as DateTime; // 각 항목에서 'date'만 추출
@@ -92,13 +91,11 @@ class ExerciseController extends GetxController {
 
       if (!exerciseDays.contains(dt)) {
         exerciseDays.add(dt); // 운동 등록 시 날짜 추가
-        print('days: $exerciseDays');
       }
       clear();
       Get.off(
           MainScreen()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
       print('운동 등록 성공');
-      printExercise();
     } catch (e) {
       print('운동 등록 실패: $e');
     }
@@ -108,7 +105,6 @@ class ExerciseController extends GetxController {
     // 기존 내용 수정
     _exerciseRepository.update(context, id, dt, selectedExercise.value,
         startTime.value, endTime.value, description.text, rating.value);
-    print('exercsiesefsd : $exerciseList');
 
     final index = exerciseList.indexWhere((exercise) => exercise['id'] == id);
 
@@ -127,7 +123,6 @@ class ExerciseController extends GetxController {
     Get.off(
         MainScreen()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
     print('운동 등록 성공');
-    printExercise();
   }
 
   void getByDate(BuildContext context, DateTime date) async {
@@ -136,26 +131,38 @@ class ExerciseController extends GetxController {
       if (response.isNotEmpty) {
         exerciseList.addAll(response);
       }
-      print('exercise : ${exerciseList}');
     } catch (e) {
       print('날짜별 운동 불러오기 실패 $e');
     }
   }
 
-  void deleteExercise(int idx) {
-    var exercise = exerciseList[idx]['종목'];
-    var date = exerciseList[idx]['날짜'];
-    exerciseList.removeAt(idx);
-
-    // 해당 날짜의 운동 기록이 없으면 exerciseDays에서 제거
-    if (!exerciseList.any((element) => element['날짜'] == date)) {
-      exerciseDays.remove(date);
+  void deleteExercise(BuildContext context, int id) async {
+    try {
+      final response = await _exerciseRepository.delete(context, id);
+    } catch (e) {
+      print('삭제 실패 $e');
     }
-    print(exercise + ' 삭제 완료');
-  }
 
-  void printExercise() {
-    print(exerciseList);
+    // ID에 해당하는 인덱스를 찾기(없으면 -1 반환)
+    int idx = exerciseList.indexWhere((exercise) => exercise['id'] == id);
+
+    // 인덱스가 유효한 경우 삭제 진행
+    if (idx != -1) {
+      var exercise = exerciseList[idx]['category'];
+      var date = exerciseList[idx]['date'];
+
+      // 리스트에서 해당 항목 삭제
+      exerciseList.removeAt(idx);
+
+      // 해당 날짜의 운동 기록이 없으면 exerciseDays에서 제거
+      if (!exerciseList.any((element) => element['date'] == date)) {
+        exerciseDays.remove(date);
+      }
+
+      print('$exercise 삭제 완료');
+    } else {
+      print('해당 ID의 운동 기록을 찾을 수 없습니다.');
+    }
   }
 
   void clear() {

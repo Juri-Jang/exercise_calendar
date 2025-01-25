@@ -96,7 +96,6 @@ class ExerciseCalender extends StatelessWidget {
                       .where((exercise) =>
                           isSameDay(exercise['date'], c.selectedDay.value))
                       .toList();
-                  print('selectedDayExercises : $selectedDayExercises');
                   return ListView.builder(
                     itemCount: selectedDayExercises.length,
                     itemBuilder: (context, index) {
@@ -105,8 +104,8 @@ class ExerciseCalender extends StatelessWidget {
                         trailing: IconButton(
                             onPressed: () {
                               // 삭제 로직
-                              c.deleteExercise(index);
-                              c.printExercise();
+                              int id = selectedDayExercises[index]['id'];
+                              c.deleteExercise(context, id);
                             },
                             icon: Icon(Icons.delete)),
                         onTap: () {

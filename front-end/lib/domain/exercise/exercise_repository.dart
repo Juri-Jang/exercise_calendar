@@ -80,6 +80,14 @@ class ExerciseRepository {
     }
   }
 
+  Future<void> delete(BuildContext context, int id) async {
+    try {
+      final response = await _exerciseProvider.delete(context, id);
+    } catch (e) {
+      print('삭제 실패 $e');
+    }
+  }
+
   Future<List<Map<String, dynamic>>> getByDate(
       BuildContext context, DateTime date) async {
     try {
