@@ -1,7 +1,6 @@
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 
 class UserController extends GetxController {
@@ -10,7 +9,6 @@ class UserController extends GetxController {
   var username = "".obs;
   var name = "Guest".obs;
   var email = "guest@example.com".obs;
-  final _storage = FlutterSecureStorage();
 
   @override
   void onInit() {

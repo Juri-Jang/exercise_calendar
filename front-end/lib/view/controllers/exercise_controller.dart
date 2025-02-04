@@ -28,16 +28,16 @@ class ExerciseController extends GetxController {
     username.value = _userController.username.value;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadAllExercises(username.value);
+      loadAllExercises(username.value, "latest");
       print('exercise $exerciseDays');
     });
     super.onInit();
   }
 
-  Future<void> _loadAllExercises(String username) async {
+  Future<void> loadAllExercises(String username, String sortBy) async {
     try {
       final response =
-          await _exerciseRepository.getAll(Get.context!, "latest", username);
+          await _exerciseRepository.getAll(Get.context!, sortBy, username);
 
       // 각 항목의 'date'를 DateTime으로 변환 후 바로 exerciseList에 추가
       final updatedExercises = response.map((e) {
@@ -53,6 +53,7 @@ class ExerciseController extends GetxController {
       }).toList();
 
       exerciseList.assignAll(updatedExercises);
+      print(exerciseList);
       exerciseDays
           .assignAll(updatedExercises.map((e) => e['date'] as DateTime));
     } catch (e) {

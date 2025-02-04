@@ -46,72 +46,71 @@ class ExerciseHistory extends StatelessWidget {
                     },
                   )),
             ),
-            // 추가적인 위젯이나 콘텐츠를 여기서 구성할 수 있습니다.
             Expanded(
-              child: ListView.builder(
-                itemCount: c.exerciseList.length,
-                itemBuilder: ((context, index) {
-                  int id = c.exerciseList[index]['id'];
-                  String category = c.exerciseList[index]['category'];
-                  DateTime exerciseDate = c.exerciseList[index]['date'];
-                  int exerciseRating = c.exerciseList[index]['rating'];
-                  Widget leadingIcon;
-                  switch (category) {
-                    case '배드민턴':
-                      leadingIcon = Image.asset('assets/badminton.png',
-                          width: 30, height: 30);
-                      break;
-                    case '축구':
-                      leadingIcon = Image.asset('assets/football.png',
-                          width: 30, height: 30);
-                      break;
-                    case '농구':
-                      leadingIcon = Image.asset('assets/basketball.png',
-                          width: 30, height: 30);
-                      break;
-                    default:
-                      leadingIcon = Icon(Icons.sports);
-                      break;
-                  }
-                  return ListTile(
-                    title: Text(category),
-                    leading: leadingIcon,
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          DateFormat('yyyy-MM-dd(EEE)', 'ko-KR')
-                              .format(exerciseDate),
-                        ),
-                        SizedBox(height: 4),
-                        Row(
+              child: Obx(() => ListView.builder(
+                    itemCount: c.exerciseList.length,
+                    itemBuilder: ((context, index) {
+                      int id = c.exerciseList[index]['id'];
+                      String category = c.exerciseList[index]['category'];
+                      DateTime exerciseDate = c.exerciseList[index]['date'];
+                      int exerciseRating = c.exerciseList[index]['rating'];
+                      Widget leadingIcon;
+                      switch (category) {
+                        case '배드민턴':
+                          leadingIcon = Image.asset('assets/badminton.png',
+                              width: 30, height: 30);
+                          break;
+                        case '축구':
+                          leadingIcon = Image.asset('assets/football.png',
+                              width: 30, height: 30);
+                          break;
+                        case '농구':
+                          leadingIcon = Image.asset('assets/basketball.png',
+                              width: 30, height: 30);
+                          break;
+                        default:
+                          leadingIcon = Icon(Icons.sports);
+                          break;
+                      }
+                      return ListTile(
+                        title: Text(category),
+                        leading: leadingIcon,
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('평점'),
-                            SizedBox(width: 4),
+                            Text(
+                              DateFormat('yyyy-MM-dd(EEE)', 'ko-KR')
+                                  .format(exerciseDate),
+                            ),
+                            SizedBox(height: 4),
                             Row(
-                              children: List.generate(
-                                5,
-                                (i) => Icon(
-                                  i < exerciseRating
-                                      ? Icons.star
-                                      : Icons.star_border,
-                                  size: 16,
-                                  color: Colors.amber,
-                                ),
-                              ),
+                              children: [
+                                Text('평점'),
+                                SizedBox(width: 4),
+                                Row(
+                                  children: List.generate(
+                                    5,
+                                    (i) => Icon(
+                                      i < exerciseRating
+                                          ? Icons.star
+                                          : Icons.star_border,
+                                      size: 16,
+                                      color: Colors.amber,
+                                    ),
+                                  ),
+                                )
+                              ],
                             )
                           ],
-                        )
-                      ],
-                    ),
-                    onTap: () async {
-                      //상세보기로 이동
-                      await c.getDetail(id);
-                      Get.to(ExerciseDetail(id, category));
-                    },
-                  );
-                }),
-              ),
+                        ),
+                        onTap: () async {
+                          //상세보기로 이동
+                          await c.getDetail(id);
+                          Get.to(ExerciseDetail(id, category));
+                        },
+                      );
+                    }),
+                  )),
             )
           ],
         ),

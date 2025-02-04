@@ -1,12 +1,39 @@
+import 'package:exercise_calendar/view/controllers/exercise_controller.dart';
+import 'package:exercise_calendar/view/controllers/user_controller.dart';
 import 'package:get/get.dart';
 
 class ExerciseHistoryController extends GetxController {
-  var selectedOption = '최신 날짜'.obs; // 기본 값 설정
+  final ExerciseController _exerciseController = Get.find<ExerciseController>();
+  final UserController _userController = Get.find<UserController>();
 
-  final List<String> sortOptions = ['최신 날짜', '오래된 날짜', '평점'];
+  var selectedOption = '최신 날짜'.obs;
+  String username = "";
 
-  void updateSelectedOption(String newOption) {
+  final List<String> sortOptions = ['최신 날짜', '오래된 날짜', '평점 높은 순'];
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    username = _userController.username.value;
+  }
+
+  void updateSelectedOption(String newOption) async {
     selectedOption.value = newOption;
-    // 여기에 선택된 옵션에 따라 데이터를 정렬하는 로직을 추가할 수 있습니다.
+    try {
+      switch (newOption) {
+        case '최신 날짜':
+          _exerciseController.loadAllExercises(username, "latest");
+          break;
+        case '오래된 날짜':
+          _exerciseController.loadAllExercises(username, "oldest");
+          break;
+        case '평점 높은 순':
+          _exerciseController.loadAllExercises(username, "highestRating");
+          break;
+      }
+    } catch (e) {
+      print('모든 운동 데이터 로드 실패: $e');
+    }
   }
 }
