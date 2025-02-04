@@ -70,7 +70,7 @@ public class ExerciseService {
         if ("highestRating".equals(sortBy)) {
             comparator = Comparator.comparingInt(Exercise::getRating).reversed(); // 평점 높은 순
         } else if ("oldest".equals(sortBy)) {
-            comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.naturalOrder())); // 오래된 날짜 순
+            comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.reverseOrder())); // 오래된 날짜 순
         } else if ("latest".equals(sortBy)) {
             comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.naturalOrder())); // 최신 날짜 순
         } else {
