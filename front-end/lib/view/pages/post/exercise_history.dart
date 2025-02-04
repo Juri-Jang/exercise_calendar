@@ -2,6 +2,7 @@ import 'package:exercise_calendar/view/controllers/exercise_controller.dart';
 import 'package:exercise_calendar/view/controllers/exercise_history_controller.dart';
 import 'package:exercise_calendar/view/components/custom_appbar.dart';
 import 'package:exercise_calendar/view/components/custom_drawer.dart';
+import 'package:exercise_calendar/view/pages/post/exercise_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -50,11 +51,12 @@ class ExerciseHistory extends StatelessWidget {
               child: ListView.builder(
                 itemCount: c.exerciseList.length,
                 itemBuilder: ((context, index) {
-                  String exerciseType = c.exerciseList[index]['category'];
+                  int id = c.exerciseList[index]['id'];
+                  String category = c.exerciseList[index]['category'];
                   DateTime exerciseDate = c.exerciseList[index]['date'];
                   int exerciseRating = c.exerciseList[index]['rating'];
                   Widget leadingIcon;
-                  switch (exerciseType) {
+                  switch (category) {
                     case '배드민턴':
                       leadingIcon = Image.asset('assets/badminton.png',
                           width: 30, height: 30);
@@ -72,7 +74,7 @@ class ExerciseHistory extends StatelessWidget {
                       break;
                   }
                   return ListTile(
-                    title: Text(exerciseType),
+                    title: Text(category),
                     leading: leadingIcon,
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,8 +104,10 @@ class ExerciseHistory extends StatelessWidget {
                         )
                       ],
                     ),
-                    onTap: () {
+                    onTap: () async {
                       //상세보기로 이동
+                      await c.getDetail(id);
+                      Get.to(ExerciseDetail(id, category));
                     },
                   );
                 }),

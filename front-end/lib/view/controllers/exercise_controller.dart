@@ -11,6 +11,7 @@ class ExerciseController extends GetxController {
   var selectedDay = DateTime.now().obs;
   var exerciseDays = <DateTime>[].obs; // 운동이 있는 날짜 리스트
   var exerciseList = <dynamic>[].obs;
+  var detail = <String, dynamic>{}.obs;
 
   var userid = 0.obs;
   var username = "".obs;
@@ -19,7 +20,6 @@ class ExerciseController extends GetxController {
   var endTime = TimeOfDay.now().obs;
   TextEditingController description = TextEditingController();
   var rating = 1.obs;
-
   var file = ''.obs; // 첨부 파일
 
   @override
@@ -61,9 +61,7 @@ class ExerciseController extends GetxController {
   }
 
   void createExercise(BuildContext context, DateTime dt, int num) async {
-    // 신규 등록
     try {
-      //DB에 저장
       final response = await _exerciseRepository.create(
           context,
           dt,
@@ -73,22 +71,27 @@ class ExerciseController extends GetxController {
           description.text,
           rating.value);
 
+      // TimeOfDay -> String 변환
+      String formattedStartTime =
+          '${startTime.value.hour.toString().padLeft(2, '0')}:${startTime.value.minute.toString().padLeft(2, '0')}';
+      String formattedEndTime =
+          '${endTime.value.hour.toString().padLeft(2, '0')}:${endTime.value.minute.toString().padLeft(2, '0')}';
+
       exerciseList.add({
         'id': response.data['id'],
         'date': dt,
         'category': selectedExercise.value,
-        'startTime': startTime.value,
-        'endTime': endTime.value,
+        'startTime': formattedStartTime, // 수정
+        'endTime': formattedEndTime, // 수정
         'description': description.text,
         'rating': rating.value
       });
 
       if (!exerciseDays.contains(dt)) {
-        exerciseDays.add(dt); // 운동 등록 시 날짜 추가
+        exerciseDays.add(dt);
       }
       clear();
-      Get.off(
-          MainScreen()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
+      Get.off(MainScreen());
       print('운동 등록 성공');
     } catch (e) {
       print('운동 등록 실패: $e');
@@ -112,11 +115,22 @@ class ExerciseController extends GetxController {
         'rating': rating.value
       };
     }
-
     clear();
     Get.off(
         MainScreen()); //달력 ui에 exerciseDays 추가를 실시간 반영하기 위해 ExerciseCalender로 이동
     print('운동 등록 성공');
+  }
+
+  Future<void> getDetail(int id) async {
+    try {
+      final index = exerciseList.indexWhere((exercise) => exercise['id'] == id);
+      if (index != -1) {
+        detail.value = Map<String, dynamic>.from(exerciseList[index]);
+        print('디테일~~ :::: $detail');
+      }
+    } catch (e) {
+      print('조회 실패 $e');
+    }
   }
 
   void getByDate(BuildContext context, DateTime date) async {
