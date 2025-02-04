@@ -2,6 +2,7 @@ import 'package:exercise_calendar/view/controllers/exercise_controller.dart';
 import 'package:exercise_calendar/view/components/custom_drawer.dart';
 import 'package:exercise_calendar/view/pages/post/exercise_create.dart';
 import 'package:exercise_calendar/view/components/custom_appbar.dart';
+import 'package:exercise_calendar/view/pages/post/exercise_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -104,16 +105,30 @@ class ExerciseCalender extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return ListTile(
                         title: Text(selectedDayExercises[index]['category']),
-                        trailing: IconButton(
-                            onPressed: () {
-                              // 삭제 로직
-                              int id = selectedDayExercises[index]['id'];
-                              c.deleteExercise(context, id);
-                            },
-                            icon: Icon(Icons.delete)),
-                        onTap: () {
-                          Get.to(() => ExerciseCreate(c.selectedDay.value, 1,
-                              exercise: selectedDayExercises[index]));
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  Get.to(() => ExerciseCreate(
+                                      c.selectedDay.value, 1,
+                                      exercise: selectedDayExercises[index]));
+                                },
+                                icon: Icon(Icons.edit)),
+                            IconButton(
+                                onPressed: () {
+                                  // 삭제 로직
+                                  int id = selectedDayExercises[index]['id'];
+                                  c.deleteExercise(context, id);
+                                },
+                                icon: Icon(Icons.delete)),
+                          ],
+                        ),
+                        onTap: () async {
+                          int id = selectedDayExercises[index]['id'];
+                          await c.getDetail(id);
+                          Get.to(ExerciseDetail(
+                              id, selectedDayExercises[index]['category']));
                         },
                       );
                     },

@@ -53,7 +53,6 @@ class ExerciseController extends GetxController {
       }).toList();
 
       exerciseList.assignAll(updatedExercises);
-      print(exerciseList);
       exerciseDays
           .assignAll(updatedExercises.map((e) => e['date'] as DateTime));
     } catch (e) {
