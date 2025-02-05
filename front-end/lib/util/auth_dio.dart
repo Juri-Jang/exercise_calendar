@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 Future authDio(BuildContext context) async {
   var dio = Dio();
-  final storage = FlutterSecureStorage();
+  final _storage = FlutterSecureStorage();
 
   // 기존 인터셉터들을 지우고 새로운 인터셉터를 설정
   dio.interceptors.clear();
@@ -15,7 +15,7 @@ Future authDio(BuildContext context) async {
   dio.interceptors.add(InterceptorsWrapper(
     // 요청을 보내기 전에 액세스 토큰을 헤더에 추가
     onRequest: (options, handler) async {
-      final accessToken = await storage.read(key: 'ACCESS_TOKEN');
+      final accessToken = await _storage.read(key: 'ACCESS_TOKEN');
       options.baseUrl = BASE_URL; // 기본 URL 설정
       options.headers.addAll({
         'access': accessToken,
@@ -26,14 +26,21 @@ Future authDio(BuildContext context) async {
 
     // 응답 오류가 발생했을 때 처리하는 부분
     onError: (error, handler) async {
-      // 401 오류(인증 실패)가 발생한 경우 처리
+      //401 오류(id / pw 유효성 오류)가 발생한 경우 처리
       if (error.response?.statusCode == 401) {
-        final refreshToken = await storage.read(key: 'REFRESH_TOKEN');
+        Get.snackbar('로그인 실패', '아이디 또는 패스워드를 확인해주세요');
+        Get.offAll(() => Login());
+      }
+      // 403 오류(jwt토큰 만료 실패)가 발생한 경우 처리
+      if (error.response?.statusCode == 403) {
+        print(error.message);
+        final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
+        print('리프레쉬 :$refreshToken');
         if (refreshToken == null) {
           // 리프레시 토큰이 없으면 로그아웃 처리 후 로그인 화면으로 이동
-          await storage.deleteAll();
+          await _storage.deleteAll();
           Get.snackbar('로그인 인증 만료', '로그인 인증이 만료 되었습니다. 다시 로그인해주세요!');
-          Get.offAll(() => Login()); // GetX를 사용한 화면 이동
+          Get.offAll(() => Login());
           return;
         }
 
@@ -57,10 +64,11 @@ Future authDio(BuildContext context) async {
                 refreshResponse.headers.value('X-Refresh-Token');
 
             if (newAccessToken != null) {
-              await storage.write(key: 'ACCESS_TOKEN', value: newAccessToken);
+              await _storage.write(key: 'ACCESS_TOKEN', value: newAccessToken);
             }
             if (newRefreshToken != null) {
-              await storage.write(key: 'REFRESH_TOKEN', value: newRefreshToken);
+              await _storage.write(
+                  key: 'REFRESH_TOKEN', value: newRefreshToken);
             }
 
             // 새로운 액세스 토큰을 요청에 추가
@@ -81,7 +89,9 @@ Future authDio(BuildContext context) async {
           }
         } catch (e) {
           // 리프레시 토큰 재발급 실패 시 처리
-          await storage.deleteAll();
+          Map<String, String> allValues = await _storage.readAll();
+          print(allValues); // 데이터를 확인하기 위해 추가
+          await _storage.deleteAll();
           Get.snackbar('로그인 인증 만료', '로그인 인증이 만료 되었습니다. 다시 로그인해주세요!');
           Get.offAll(() => Login());
           return;
