@@ -127,7 +127,7 @@ class ExerciseCalender extends StatelessWidget {
                         onTap: () async {
                           int id = selectedDayExercises[index]['id'];
                           await c.getDetail(id);
-                          Get.to(ExerciseDetail(
+                          Get.to(() => ExerciseDetail(
                               id, selectedDayExercises[index]['category']));
                         },
                       );
