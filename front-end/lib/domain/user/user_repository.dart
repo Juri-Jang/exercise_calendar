@@ -30,7 +30,11 @@ class UserRepository {
           final refreshToken = _extractCookieValue(cookies, "refresh");
           if (accessToken != null && refreshToken != null) {
             // 액세스, 리프레쉬 토큰 저장
-            await _storage.write(key: 'ACCESS_TOKEN', value: accessToken);
+            //await _storage.write(key: 'ACCESS_TOKEN', value: accessToken);ㅌ
+            await _storage.write(
+                key: 'ACCESS_TOKEN',
+                value:
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsInVzZXJuYW1lIjoiamFuZyIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzM1MzY4NjQ5LCJleHAiOjE3MzUzNjkyNDl9.3DEecYW5HDTcIoc9Q5Z4vjmYZXOxJwz6ZlE8ydwMHu0');
             print("액세스 토큰 저장 완료");
             await _storage.write(key: 'REFRESH_TOKEN', value: refreshToken);
             print("리프레쉬 토큰 저장 완료");
@@ -84,6 +88,7 @@ class UserRepository {
     final accessToken = await _storage.read(key: 'ACCESS_TOKEN');
     final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
 
+    //토큰이 있을 경우, 토큰 유효성 검사
     if (accessToken != null && refreshToken != null) {
       final response =
           await _userProvider.validateToken(context, refreshToken!);

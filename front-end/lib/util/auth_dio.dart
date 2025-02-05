@@ -33,6 +33,7 @@ Future authDio(BuildContext context) async {
       }
       // 403 오류(jwt토큰 만료 실패)가 발생한 경우 처리
       if (error.response?.statusCode == 403) {
+        print('에매~~~ ${error.response?.statusMessage}');
         print(error.message);
         final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
         print('리프레쉬 :$refreshToken');

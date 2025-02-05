@@ -1,10 +1,12 @@
 import 'package:exercise_calendar/domain/user/user_repository.dart';
 import 'package:exercise_calendar/view/components/main_screen.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 
 class UserController extends GetxController {
   final UserRepository _userRepository = UserRepository();
+  final _storage = new FlutterSecureStorage();
   var user_id = 0.obs;
   var username = "".obs;
   var name = "Guest".obs;
@@ -16,12 +18,20 @@ class UserController extends GetxController {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserInfo(); // 앱 시작 시 사용자 정보 로드
     });
+    printSecureStorage();
+  }
+
+  //테스트코드
+  void printSecureStorage() async {
+    Map<String, String> allValues = await _storage.readAll();
+    print(allValues); // 데이터를 확인하기 위해 추가
   }
 
   // 로그인 상태 확인 및 사용자 정보 로딩
   Future<bool> loadUserInfo() async {
     if (Get.context != null) {
       final isLoggedIn = await _userRepository.isLoggedIn(Get.context!);
+      printSecureStorage();
       if (isLoggedIn) {
         await _fetchAndSetUserInfo(); // 로그인 상태라면 사용자 정보 로드
         return true;
@@ -38,6 +48,7 @@ class UserController extends GetxController {
   // 사용자 정보를 가져와서 저장하는 함수 (로그인/앱 시작 시 공통)
   Future<void> _fetchAndSetUserInfo() async {
     try {
+      printSecureStorage();
       final userInfo = await _userRepository.getUserInfo(Get.context!);
       name.value = userInfo['name'] ?? 'Guest'; // null 값 처리
       email.value = userInfo['email'] ?? 'guest@example.com'; // null 값 처리

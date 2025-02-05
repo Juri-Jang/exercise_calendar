@@ -76,19 +76,19 @@ public class UserController {
         try {
             jwtUtil.isExpired(refreshToken);
         } catch (ExpiredJwtException e) {
-            return new ResponseEntity<>("refresh token expired", HttpStatusCode.valueOf(HttpServletResponse.SC_BAD_REQUEST));
+            return new ResponseEntity<>("refresh token expired", HttpStatusCode.valueOf(HttpServletResponse.SC_FORBIDDEN));
         }
 
         // Refresh Token 카테고리 확인
         String category = jwtUtil.getCategory(refreshToken);
         if (!"refresh".equals(category)) {
-            return new ResponseEntity<>("invalid refresh token", HttpStatusCode.valueOf(HttpServletResponse.SC_BAD_REQUEST));
+            return new ResponseEntity<>("invalid refresh token", HttpStatusCode.valueOf(HttpServletResponse.SC_FORBIDDEN));
         }
 
         // Refresh Token의 유효성 (DB에 저장된 값과 비교)
         boolean isExist = refreshRepository.existsByRefresh(refreshToken);
         if (!isExist) {
-            return new ResponseEntity<>("invalid refresh token", HttpStatusCode.valueOf(HttpServletResponse.SC_BAD_REQUEST));
+            return new ResponseEntity<>("invalid refresh token", HttpStatusCode.valueOf(HttpServletResponse.SC_FORBIDDEN));
         }
 
         // 정상적인 경우

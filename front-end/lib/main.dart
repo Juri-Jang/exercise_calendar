@@ -13,7 +13,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  UserController _uc = UserController();
   MyApp({super.key});
 
   @override

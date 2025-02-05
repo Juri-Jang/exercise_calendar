@@ -126,7 +126,6 @@ class ExerciseController extends GetxController {
       final index = exerciseList.indexWhere((exercise) => exercise['id'] == id);
       if (index != -1) {
         detail.value = Map<String, dynamic>.from(exerciseList[index]);
-        print('디테일~~ :::: $detail');
       }
     } catch (e) {
       print('조회 실패 $e');
