@@ -59,11 +59,11 @@ public class ReissueController {
         String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);
         String newAccess = jwtUtil.createJwt("access", username, role, 600000L); // 10분
-        String newRefresh = jwtUtil.createJwt("refresh", username, role, 86400000L); // 24시간
+        String newRefresh = jwtUtil.createJwt("refresh", username, role, 604800000L); // 7일
 
         // 기존 리프레시 토큰 삭제 후 새로 저장
         refreshRepository.deleteByRefresh(refresh);
-        addRefreshEntity(username, newRefresh, 86400000L);
+        addRefreshEntity(username, newRefresh, 604800000L);
 
         // 6. 응답에 새 토큰 전달 (헤더로 설정)
         response.setHeader("access", newAccess);
