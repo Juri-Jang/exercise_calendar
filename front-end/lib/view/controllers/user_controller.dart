@@ -18,7 +18,6 @@ class UserController extends GetxController {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       loadUserInfo(); // 앱 시작 시 사용자 정보 로드
     });
-    printSecureStorage();
   }
 
   //테스트코드
@@ -31,7 +30,6 @@ class UserController extends GetxController {
   Future<bool> loadUserInfo() async {
     if (Get.context != null) {
       final isLoggedIn = await _userRepository.isLoggedIn(Get.context!);
-      printSecureStorage();
       if (isLoggedIn) {
         await _fetchAndSetUserInfo(); // 로그인 상태라면 사용자 정보 로드
         return true;
@@ -48,7 +46,6 @@ class UserController extends GetxController {
   // 사용자 정보를 가져와서 저장하는 함수 (로그인/앱 시작 시 공통)
   Future<void> _fetchAndSetUserInfo() async {
     try {
-      printSecureStorage();
       final userInfo = await _userRepository.getUserInfo(Get.context!);
       name.value = userInfo['name'] ?? 'Guest'; // null 값 처리
       email.value = userInfo['email'] ?? 'guest@example.com'; // null 값 처리

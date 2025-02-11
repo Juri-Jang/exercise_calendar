@@ -16,38 +16,34 @@ Future authDio(BuildContext context) async {
     // 요청을 보내기 전에 액세스 토큰을 헤더에 추가
     onRequest: (options, handler) async {
       final accessToken = await _storage.read(key: 'ACCESS_TOKEN');
-      options.baseUrl = BASE_URL; // 기본 URL 설정
+      options.baseUrl = BASE_URL;
       options.headers.addAll({
         'access': accessToken,
         'Content-Type': 'application/json',
       });
       return handler.next(options); // 요청을 계속 진행
     },
-
-    // 응답 오류가 발생했을 때 처리하는 부분
     onError: (error, handler) async {
       //401 오류(id / pw 유효성 오류)가 발생한 경우 처리
       if (error.response?.statusCode == 401) {
+        // 로그인 실패 처리
         Get.snackbar('로그인 실패', '아이디 또는 패스워드를 확인해주세요');
         Get.offAll(() => Login());
       }
+
       // 403 오류(jwt토큰 만료 실패)가 발생한 경우 처리
       if (error.response?.statusCode == 403) {
-        print('에매~~~ ${error.response?.statusMessage}');
-        print(error.message);
+        // 토큰 만료 시, 한 번만 리프레시 토큰을 요청하도록 방지
         final refreshToken = await _storage.read(key: 'REFRESH_TOKEN');
-        print('리프레쉬 :$refreshToken');
         if (refreshToken == null) {
-          // 리프레시 토큰이 없으면 로그아웃 처리 후 로그인 화면으로 이동
           await _storage.deleteAll();
           Get.snackbar('로그인 인증 만료', '로그인 인증이 만료 되었습니다. 다시 로그인해주세요!');
           Get.offAll(() => Login());
           return;
         }
 
-        // 리프레시 토큰을 사용하여 새로운 액세스 토큰을 요청
         var refreshDio = Dio();
-        refreshDio.options.baseUrl = BASE_URL; // 기본 URL 설정
+        refreshDio.options.baseUrl = BASE_URL;
 
         try {
           final refreshResponse = await refreshDio.post(
@@ -86,12 +82,10 @@ Future authDio(BuildContext context) async {
               queryParameters: error.requestOptions.queryParameters,
             );
 
+            // 성공적으로 요청을 처리하고 재발급된 토큰을 다시 사용
             return handler.resolve(clonedRequest); // 수정된 요청으로 응답 처리
           }
         } catch (e) {
-          // 리프레시 토큰 재발급 실패 시 처리
-          Map<String, String> allValues = await _storage.readAll();
-          print(allValues); // 데이터를 확인하기 위해 추가
           await _storage.deleteAll();
           Get.snackbar('로그인 인증 만료', '로그인 인증이 만료 되었습니다. 다시 로그인해주세요!');
           Get.offAll(() => Login());
