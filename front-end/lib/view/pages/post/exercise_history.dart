@@ -81,11 +81,13 @@ class ExerciseHistory extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 // 검색어가 있으면 필터링된 목록을, 없으면 전체 목록을 보여줌
-                var filteredList = c.exerciseList.where((exercise) {
-                  return exercise['category']
-                      .toString()
-                      .contains(hc.searchQuery.value);
-                }).toList();
+                var filteredList = hc.searchQuery.value.isEmpty
+                    ? c.exerciseList // 검색어가 없으면 전체 목록
+                    : c.exerciseList.where((exercise) {
+                        return exercise['category']
+                            .toString()
+                            .contains(hc.searchQuery.value);
+                      }).toList();
 
                 return ListView.builder(
                   itemCount: filteredList.length,
