@@ -20,6 +20,7 @@ class ExerciseHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ExerciseHistoryController hc = Get.put(ExerciseHistoryController());
+    final TextEditingController searchController = TextEditingController();
 
     return Scaffold(
       appBar: CustomAppBar(title: '운동 조회'),
@@ -30,87 +31,126 @@ class ExerciseHistory extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Align(
-              alignment: Alignment.centerRight, // 드롭다운 버튼을 오른쪽 정렬
-              child: Obx(() => DropdownButton<String>(
-                    value: hc.selectedOption.value,
-                    items: hc.sortOptions.map((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        hc.updateSelectedOption(newValue);
-                      }
-                    },
-                  )),
+              alignment: Alignment.centerRight,
+              child: Obx(
+                () => Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          hintText: "운동을 검색하세요",
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 10),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(),
+                              borderRadius: BorderRadius.circular(10)),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            size: 20,
+                          ),
+                        ),
+                        onChanged: (value) {
+                          hc.updateSearchQuery(value); // 검색어 업데이트
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 15),
+                    DropdownButton<String>(
+                      value: hc.selectedOption.value,
+                      items: hc.sortOptions.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(
+                            value,
+                            style: TextStyle(fontSize: 13),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          hc.updateSelectedOption(newValue);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ),
             Expanded(
-              child: Obx(() => ListView.builder(
-                    itemCount: c.exerciseList.length,
-                    itemBuilder: ((context, index) {
-                      int id = c.exerciseList[index]['id'];
-                      String category = c.exerciseList[index]['category'];
-                      DateTime exerciseDate = c.exerciseList[index]['date'];
-                      int exerciseRating = c.exerciseList[index]['rating'];
-                      Widget leadingIcon;
-                      switch (category) {
-                        case '배드민턴':
-                          leadingIcon = Image.asset('assets/badminton.png',
-                              width: 30, height: 30);
-                          break;
-                        case '축구':
-                          leadingIcon = Image.asset('assets/football.png',
-                              width: 30, height: 30);
-                          break;
-                        case '농구':
-                          leadingIcon = Image.asset('assets/basketball.png',
-                              width: 30, height: 30);
-                          break;
-                        default:
-                          leadingIcon = Icon(Icons.sports);
-                          break;
-                      }
-                      return ListTile(
-                        title: Text(category),
-                        leading: leadingIcon,
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              DateFormat('yyyy-MM-dd(EEE)', 'ko-KR')
-                                  .format(exerciseDate),
-                            ),
-                            SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Text('평점'),
-                                SizedBox(width: 4),
-                                Row(
-                                  children: List.generate(
-                                    5,
-                                    (i) => Icon(
-                                      i < exerciseRating
-                                          ? Icons.star
-                                          : Icons.star_border,
-                                      size: 16,
-                                      color: Colors.amber,
-                                    ),
+              child: Obx(() {
+                // 검색어가 있으면 필터링된 목록을, 없으면 전체 목록을 보여줌
+                var filteredList = c.exerciseList.where((exercise) {
+                  return exercise['category']
+                      .toString()
+                      .contains(hc.searchQuery.value);
+                }).toList();
+
+                return ListView.builder(
+                  itemCount: filteredList.length,
+                  itemBuilder: ((context, index) {
+                    int id = filteredList[index]['id'];
+                    String category = filteredList[index]['category'];
+                    DateTime exerciseDate = filteredList[index]['date'];
+                    int exerciseRating = filteredList[index]['rating'];
+                    Widget leadingIcon;
+                    switch (category) {
+                      case '배드민턴':
+                        leadingIcon = Image.asset('assets/badminton.png',
+                            width: 30, height: 30);
+                        break;
+                      case '축구':
+                        leadingIcon = Image.asset('assets/football.png',
+                            width: 30, height: 30);
+                        break;
+                      case '농구':
+                        leadingIcon = Image.asset('assets/basketball.png',
+                            width: 30, height: 30);
+                        break;
+                      default:
+                        leadingIcon = Icon(Icons.sports);
+                        break;
+                    }
+                    return ListTile(
+                      title: Text(category),
+                      leading: leadingIcon,
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DateFormat('yyyy-MM-dd(EEE)', 'ko-KR')
+                                .format(exerciseDate),
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text('평점'),
+                              SizedBox(width: 4),
+                              Row(
+                                children: List.generate(
+                                  5,
+                                  (i) => Icon(
+                                    i < exerciseRating
+                                        ? Icons.star
+                                        : Icons.star_border,
+                                    size: 16,
+                                    color: Colors.amber,
                                   ),
-                                )
-                              ],
-                            )
-                          ],
-                        ),
-                        onTap: () async {
-                          //상세보기로 이동
-                          await c.getDetail(id);
-                          Get.to(ExerciseDetail(id, category));
-                        },
-                      );
-                    }),
-                  )),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                      onTap: () async {
+                        await c.getDetail(id);
+                        Get.to(ExerciseDetail(id, category));
+                      },
+                    );
+                  }),
+                );
+              }),
             )
           ],
         ),

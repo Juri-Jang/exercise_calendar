@@ -8,6 +8,7 @@ class ExerciseHistoryController extends GetxController {
 
   var selectedOption = '최신 날짜'.obs;
   String username = "";
+  var searchQuery = ''.obs;
 
   final List<String> sortOptions = ['최신 날짜', '오래된 날짜', '평점 높은 순'];
 
@@ -35,5 +36,9 @@ class ExerciseHistoryController extends GetxController {
     } catch (e) {
       print('모든 운동 데이터 로드 실패: $e');
     }
+  }
+
+  void updateSearchQuery(String query) {
+    searchQuery.value = query;
   }
 }
