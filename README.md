@@ -19,6 +19,5 @@
 -  **운동 기록 상세 조회 및 수정/삭제**
 ---
 ### 프로젝트 결과물
-<img src="/imgs/로그인.png" alt="로그인" height=400> <img src="/imgs/회원가입.png" alt="회원가입" height=400>  
-<img src="/imgs/메인.png" alt="메입" height=400> <img src="/imgs/등록.png" alt="등록" height=400>  
-<img src="/imgs/상세조회.png" alt="상세조회" height=400> <img src="/imgs/조회.png" alt="조회" height=400>
+<img src="/imgs/로그인.png" alt="로그인" height=400> <img src="/imgs/회원가입.png" alt="회원가입" height=400><img src="/imgs/메인.png" alt="메입" height=400>  
+<img src="/imgs/등록.png" alt="등록" height=400><img src="/imgs/상세조회.png" alt="상세조회" height=400> <img src="/imgs/조회.png" alt="조회" height=400>
