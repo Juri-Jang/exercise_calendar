@@ -127,31 +127,31 @@ class Login extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Center(
-                    child: SizedBox(
-                      width: 300,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // 구글 로그인
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/google.png',
-                              width: 30,
-                              height: 30,
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              '구글로 회원가입 하기',
-                              style: TextStyle(color: Colors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Center(
+                  //   child: SizedBox(
+                  //     width: 300,
+                  //     child: ElevatedButton(
+                  //       onPressed: () {
+                  //         // 구글 로그인
+                  //       },
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           Image.asset(
+                  //             'assets/google.png',
+                  //             width: 30,
+                  //             height: 30,
+                  //           ),
+                  //           SizedBox(width: 10),
+                  //           Text(
+                  //             '구글로 회원가입 하기',
+                  //             style: TextStyle(color: Colors.black),
+                  //           )
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   TextButton(
                     onPressed: () {
                       // 회원가입 페이지 이동
