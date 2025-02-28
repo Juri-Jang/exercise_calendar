@@ -70,9 +70,11 @@ public class ExerciseService {
         if ("highestRating".equals(sortBy)) {
             comparator = Comparator.comparingInt(Exercise::getRating).reversed(); // 평점 높은 순
         } else if ("oldest".equals(sortBy)) {
-            comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.reverseOrder())); // 오래된 날짜 순
+            //comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.reverseOrder()));
+            comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.naturalOrder())); // 오래된 날짜 순
         } else if ("latest".equals(sortBy)) {
-            comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.naturalOrder())); // 최신 날짜 순
+            comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.reverseOrder()));
+            //comparator = Comparator.comparing(Exercise::getDate, Comparator.nullsFirst(Comparator.naturalOrder())); // 최신 날짜 순
         } else {
             // `sortBy`가 `null` 또는 예상하지 못한 값인 경우 기본 동작 설정
             throw new IllegalArgumentException("유효하지 않은 정렬 기준입니다: " + sortBy);
