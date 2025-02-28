@@ -194,31 +194,31 @@ class ExerciseCreate extends StatelessWidget {
                       ));
                 }),
               ),
-              Text('첨부'),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: '첨부 파일을 등록하세요',
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: Text(
-                      '선택하기',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 88, 95, 227),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
+              // Text('첨부'),
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: TextField(
+              //         decoration: InputDecoration(
+              //           border: OutlineInputBorder(),
+              //           labelText: '첨부 파일을 등록하세요',
+              //         ),
+              //       ),
+              //     ),
+              //     SizedBox(width: 8),
+              //     ElevatedButton(
+              //       onPressed: () {},
+              //       child: Text(
+              //         '선택하기',
+              //         style: TextStyle(color: Colors.white),
+              //       ),
+              //       style: ElevatedButton.styleFrom(
+              //         backgroundColor: Color.fromARGB(255, 88, 95, 227),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // SizedBox(height: 16),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
