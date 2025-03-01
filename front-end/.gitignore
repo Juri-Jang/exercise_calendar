@@ -41,3 +41,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# 환경 설정 파일 (API 키, URL)
+lib/util/constants.dart
+.env
